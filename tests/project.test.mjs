@@ -43,6 +43,10 @@ assert.deepEqual(elementTypes, editorTypes, 'editor does not cover every element
 assert.deepEqual(elementTypes, renderedTypes, 'renderer does not cover every element type');
 assert.ok(!renderer.slice(renderer.indexOf("case 'joystick'"), renderer.indexOf("case 'carousel'")).includes("document.addEventListener('mousemove', onMove);"), 'interactive controls leaked global listeners');
 assert.ok(bundle.includes('Scratch.extensions.register(new SuperGUI(runtime))'), 'bundle does not register');
+assert.ok(bundle.includes('Scratch.runtime') && bundle.includes('globalThis.vm'), 'bundle must support host runtime locations');
+for (const host of ['PenguinMod', 'TurboWarp', 'Gandi IDE']) {
+  assert.ok(bundle.includes(host), `bundle does not identify ${host} support`);
+}
 assert.ok(!bundle.includes('import {') && !bundle.includes('export class'), 'module syntax leaked into bundle');
 
 console.log(`OK: ${opcodes.length} blocks, ${methods.size} methods, categorized editor, current bundle`);

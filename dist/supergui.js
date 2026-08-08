@@ -1,5 +1,5 @@
 // SuperGUI v4 - generated file; edit src/ and run `npm run build`.
-// Load this file as an unsandboxed custom extension in PenguinMod or TurboWarp.
+// Load this file as an unsandboxed custom extension in PenguinMod, TurboWarp, or Gandi IDE.
 (function (Scratch) {
   'use strict';
   if (!Scratch || !Scratch.extensions || !Scratch.extensions.unsandboxed) {
@@ -2618,7 +2618,10 @@ class SuperGUI {
   }
 
 
-  const runtime = Scratch.vm ? Scratch.vm.runtime : window.vm && window.vm.runtime;
+  // Hosts expose the VM in slightly different places. Prefer the public Scratch
+  // object, then use the globals provided by older editor builds.
+  const runtime = (Scratch.vm && Scratch.vm.runtime) || Scratch.runtime ||
+    (globalThis.vm && globalThis.vm.runtime);
   if (!runtime) throw new Error('SuperGUI could not find the Scratch runtime.');
   Scratch.extensions.register(new SuperGUI(runtime));
 })(globalThis.Scratch);
