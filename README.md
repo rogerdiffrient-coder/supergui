@@ -1,13 +1,13 @@
 # SuperGUI
 
-SuperGUI is an unsandboxed custom extension for building complete, interactive, stage-aligned interfaces in PenguinMod and TurboWarp. Panels are only one part of it: SuperGUI also includes form controls, game inputs, status widgets, media, animation, themes, persistence, and a visual editor.
+SuperGUI is an unsandboxed custom extension for building complete, interactive, stage-aligned interfaces in PenguinMod, TurboWarp, and Gandi IDE. Panels are only one part of it: SuperGUI also includes form controls, game inputs, status widgets, media, animation, themes, persistence, and a visual editor.
 
 It also includes optional achievements and leaderboards backed by local storage, Storage+, or Server Storage, plus integration with Free Servers for WebSocket availability checks. See [Game services](docs/GAME_SERVICES.md) for setup and limitations.
 
 ## Use the extension
 
 1. Download [`dist/supergui.js`](dist/supergui.js).
-2. In PenguinMod or TurboWarp, open **Add Extension** and choose **Custom Extension**.
+2. In PenguinMod, TurboWarp, or Gandi IDE, open **Add Extension** and choose **Custom Extension**.
 3. Select or host `supergui.js`, and enable **Run extension without sandbox**.
 4. Use **open SuperGUI editor** to create your interface, then click **Save** in the editor.
 
@@ -52,7 +52,7 @@ dist/supergui.js                 Ready-to-upload extension
 
 ## Compatibility
 
-SuperGUI targets modern browsers used by PenguinMod and TurboWarp. It must run unsandboxed. Standard Scratch does not support loading arbitrary custom JavaScript extensions.
+SuperGUI targets modern browsers used by PenguinMod, TurboWarp, and Gandi IDE. It must run unsandboxed. Standard Scratch does not support loading arbitrary custom JavaScript extensions.
 
 ## License
 
