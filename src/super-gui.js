@@ -29,6 +29,7 @@ export class SuperGUI {
       this._particleAnims = {};
       this._carouselTimers = {};
       this._lastMouseX = 0; this._lastMouseY = 0;
+      this._achievementPopup = { enabled:true, animation:'slide', duration:3 };
       this.gameServices = new GameServices(this);
       this._buildOverlay();
       this._renderAll();
@@ -270,6 +271,10 @@ export class SuperGUI {
           { opcode: 'getAchievementPoints', blockType: B.REPORTER, text: 'player achievement points' },
           { opcode: 'getAchievementDefinitions', blockType: B.REPORTER, text: 'achievement definitions' },
           { opcode: 'showAchievementInElement', blockType: B.COMMAND, text: 'show achievement [A] in UI element [E]', arguments: { A: { type: S.STRING, defaultValue: 'first-win' }, E: str('elements') } },
+          { opcode: 'setAchievementPopups', blockType: B.COMMAND, text: 'set achievement popups [STATE]', arguments: { STATE: str('onOff') } },
+          { opcode: 'setAchievementPopupAnimation', blockType: B.COMMAND, text: 'set achievement popup animation [ANIMATION]', arguments: { ANIMATION: str('popupAnimations') } },
+          { opcode: 'setAchievementPopupDuration', blockType: B.COMMAND, text: 'set achievement popup duration [SECONDS] seconds', arguments: { SECONDS: num(3) } },
+          { opcode: 'showAchievementPopup', blockType: B.COMMAND, text: 'show popup for achievement [A]', arguments: { A: { type: S.STRING, defaultValue: 'first-win' } } },
           { opcode: 'whenAchievementUnlocked', blockType: B.HAT, text: 'when achievement [A] unlocked', arguments: { A: { type: S.STRING, defaultValue: 'first-win' } } },
 
           { blockType: B.LABEL, text: '─── Leaderboards ───' },
@@ -320,7 +325,9 @@ export class SuperGUI {
           scoreModes: { acceptReporters: false, items: ['best','latest'] },
           skinRepeats: { acceptReporters: false, items: ['stretch','round','repeat','space'] },
           healthArtModes: { acceptReporters: false, items: ['image','builtIn','none'] },
-          healthPieces: { acceptReporters: false, items: ['left','middle','right'] }
+          healthPieces: { acceptReporters: false, items: ['left','middle','right'] },
+          onOff: { acceptReporters: false, items: ['on','off'] },
+          popupAnimations: { acceptReporters: false, items: ['slide','pop','bounce','fade','none'] }
         }
       };
     }
@@ -810,6 +817,39 @@ export class SuperGUI {
       const state = await this.gameServices.achievementState(a.A);
       Object.assign(f.el, achievement, { achievementId:achievement.id, progress:state.progress || 0, unlocked:!!state.unlockedAt });
       this._renderPanel(f.panelKey);
+    }
+    setAchievementPopups(a) { this._achievementPopup.enabled = String(a.STATE).toLowerCase() !== 'off'; }
+    setAchievementPopupAnimation(a) {
+      const animation = String(a.ANIMATION || 'slide');
+      this._achievementPopup.animation = ['slide','pop','bounce','fade','none'].includes(animation) ? animation : 'slide';
+    }
+    setAchievementPopupDuration(a) { this._achievementPopup.duration = Math.max(0.5, Math.min(30, Number(a.SECONDS) || 3)); }
+    showAchievementPopup(a) { const achievement = this.gameServices.getAchievement(a.A); if (achievement) this._showAchievementPopup(achievement); }
+    _onAchievementUnlocked(achievement) { if (this._achievementPopup.enabled) this._showAchievementPopup(achievement); }
+    _showAchievementPopup(achievement) {
+      if (!this.overlay || !achievement) return;
+      const popup = document.createElement('div');
+      popup.className = 'supergui-achievement-popup';
+      popup.style.cssText = 'position:absolute;right:12px;top:12px;width:220px;min-height:58px;display:grid;grid-template-columns:42px 1fr;gap:10px;align-items:center;padding:9px 12px;box-sizing:border-box;border:1px solid #ffd166;border-radius:9px;background:linear-gradient(135deg,#232735,#171a24);color:#fff;font:12px sans-serif;box-shadow:0 8px 24px #0009;pointer-events:none;z-index:2147483647;';
+      const icon = document.createElement('div'); icon.textContent = achievement.icon || '🏆'; icon.style.cssText = 'font-size:30px;text-align:center;';
+      const copy = document.createElement('div');
+      const title = document.createElement('strong'); title.textContent = achievement.title || achievement.id || 'Achievement unlocked'; title.style.cssText = 'display:block;color:#ffd166;font-size:13px;margin-bottom:3px;';
+      const description = document.createElement('span'); description.textContent = achievement.description || 'Achievement unlocked!'; description.style.opacity = '0.85';
+      copy.appendChild(title); copy.appendChild(description); popup.appendChild(icon); popup.appendChild(copy); this.overlay.appendChild(popup);
+      const frames = {
+        slide:[{opacity:0,transform:'translateX(45px)'},{opacity:1,transform:'translateX(0)'}],
+        pop:[{opacity:0,transform:'scale(.65)'},{opacity:1,transform:'scale(1.06)',offset:.7},{opacity:1,transform:'scale(1)'}],
+        bounce:[{opacity:0,transform:'translateY(-35px)'},{opacity:1,transform:'translateY(8px)',offset:.65},{opacity:1,transform:'translateY(0)'}],
+        fade:[{opacity:0},{opacity:1}], none:[{opacity:1},{opacity:1}]
+      };
+      const animation = typeof popup.animate === 'function' ? popup.animate(frames[this._achievementPopup.animation] || frames.slide, { duration:420, easing:'cubic-bezier(.2,.8,.2,1)', fill:'both' }) : null;
+      const lifetime = this._achievementPopup.duration * 1000;
+      setTimeout(() => {
+        if (animation) animation.cancel();
+        if (typeof popup.animate !== 'function') { popup.remove(); return; }
+        const out = popup.animate([{opacity:1},{opacity:0,transform:'translateY(-8px)'}], {duration:220,fill:'forwards'});
+        out.onfinish = () => popup.remove();
+      }, lifetime);
     }
     whenAchievementUnlocked() { return false; }
     submitLeaderboardScore(a) { return this.gameServices.submitScore(a.B, a.S, a.M); }

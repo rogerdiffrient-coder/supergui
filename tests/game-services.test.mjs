@@ -8,7 +8,11 @@ globalThis.localStorage = {
 };
 
 const hats = [];
-const owner = { runtime: { _primitives: {}, startHats: (name, match) => hats.push({ name, match }) } };
+const popupAchievements = [];
+const owner = {
+  runtime: { _primitives: {}, startHats: (name, match) => hats.push({ name, match }) },
+  _onAchievementUnlocked: achievement => popupAchievements.push(achievement.id)
+};
 const services = new GameServices(owner);
 services.setNamespace('Example Game');
 services.setPlayer('Player One');
@@ -21,6 +25,7 @@ assert.equal(await services.unlock('first-win'), false);
 assert.equal((await services.achievementState('first-win')).unlockedAt > 0, true);
 assert.equal(await services.totalPoints(), 10);
 assert.equal(hats[0].name, 'supergui_whenAchievementUnlocked');
+assert.deepEqual(popupAchievements, ['first-win']);
 
 await services.submitScore('main', 50, 'best');
 await services.submitScore('main', 20, 'best');

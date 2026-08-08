@@ -41,6 +41,7 @@ assert.ok((editor.match(/<optgroup/g) || []).length >= 4, 'editor element choice
 assert.match(editor, /'Default selected', 'select'/, 'choice defaults must use a dropdown in the editor');
 assert.match(editor, /wrapNode\.style\.transform='rotate\('/, 'rotation drag must update the live editor node');
 assert.doesNotMatch(editor.match(/function startRotate[\s\S]*?function m\(ev\)\{([^}]*)\}/)[1], /renderStage/, 'rotation drag must not replace its live node');
+assert.doesNotMatch(editor, /className='rothandle'[\s\S]{0,250}renderAll\(\)/, 'rotation handle must not detach its node before dragging');
 assert.deepEqual(elementTypes, defaultTypes, 'model defaults do not cover every element type');
 assert.deepEqual(elementTypes, editorTypes, 'editor does not cover every element type');
 assert.deepEqual(elementTypes, renderedTypes, 'renderer does not cover every element type');
@@ -48,6 +49,7 @@ assert.ok(!renderer.slice(renderer.indexOf("case 'joystick'"), renderer.indexOf(
 assert.ok(bundle.includes('Scratch.extensions.register(new SuperGUI(runtime))'), 'bundle does not register');
 assert.ok(bundle.includes('Scratch.runtime') && bundle.includes('globalThis.vm'), 'bundle must support host runtime locations');
 assert.ok(bundle.includes("transform-origin:top left") && bundle.includes("r.width / 480"), 'overlay must scale from Scratch stage coordinates');
+assert.ok(bundle.includes("popupAnimations") && bundle.includes("supergui-achievement-popup"), 'bundle must include configurable achievement popups');
 for (const host of ['PenguinMod', 'TurboWarp', 'Gandi IDE']) {
   assert.ok(bundle.includes(host), `bundle does not identify ${host} support`);
 }

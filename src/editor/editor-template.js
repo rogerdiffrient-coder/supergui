@@ -208,6 +208,13 @@ select#addElementType option { color:var(--text); font-weight:400; }
     });
   }
 
+  function selectElement(key, id, node) {
+    selectedPanel=key; selectedElement=id;
+    document.querySelectorAll('.ed-el.selected').forEach(function(item){item.classList.remove('selected');});
+    node.classList.add('selected');
+    renderPanelList(); renderElementList(); renderProps();
+  }
+
   function addField(container, label, type, value, onChange, options) {
     var f=document.createElement('div'); f.className='field'+(type==='checkbox'?' checkbox':'');
     if (type==='checkbox') {
@@ -537,9 +544,9 @@ select#addElementType option { color:var(--text); font-weight:400; }
           if (el.skin&&el.skin.url) { wrap.style.border=(Number(el.skin.width)||0)+'px solid transparent'; wrap.style.borderImageSource='url("'+el.skin.url+'")'; wrap.style.borderImageSlice=(Number(el.skin.slice)||0)+' fill'; wrap.style.borderImageWidth=String(Number(el.skin.width)||0); wrap.style.borderImageRepeat=el.skin.repeat||'stretch'; }
           wrap.appendChild(buildInnerPreview(el));
           if (!previewMode) {
-            wrap.addEventListener('mousedown', function(e){e.stopPropagation(); selectedPanel=key; selectedElement=id; renderAll(); startDrag(e, panel, el);});
-            var h=document.createElement('div'); h.className='handle'; h.addEventListener('mousedown', function(e){e.stopPropagation(); selectedPanel=key; selectedElement=id; renderAll(); startResize(e, panel, el);}); wrap.appendChild(h);
-            var rh=document.createElement('div'); rh.className='rothandle'; rh.addEventListener('mousedown', function(e){e.stopPropagation(); selectedPanel=key; selectedElement=id; renderAll(); startRotate(e, panel, el, wrap);}); wrap.appendChild(rh);
+            wrap.addEventListener('mousedown', function(e){e.preventDefault();e.stopPropagation();selectElement(key,id,wrap);startDrag(e,panel,el);});
+            var h=document.createElement('div'); h.className='handle'; h.addEventListener('mousedown', function(e){e.preventDefault();e.stopPropagation();selectElement(key,id,wrap);startResize(e,panel,el);}); wrap.appendChild(h);
+            var rh=document.createElement('div'); rh.className='rothandle'; rh.addEventListener('mousedown', function(e){e.preventDefault();e.stopPropagation();selectElement(key,id,wrap);startRotate(e,panel,el,wrap);}); wrap.appendChild(rh);
           }
           div.appendChild(wrap);
         });

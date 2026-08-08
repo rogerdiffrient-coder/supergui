@@ -127,6 +127,7 @@ export class GameServices {
       profile.points += achievement.points;
       await this._set(this._key('player', this.playerId), JSON.stringify(profile));
       this.owner.runtime.startHats('supergui_whenAchievementUnlocked', { A: id });
+      if (typeof this.owner._onAchievementUnlocked === 'function') this.owner._onAchievementUnlocked(achievement);
       return true;
     }, false);
   }
