@@ -1,15 +1,30 @@
 # SuperGUI
 
-SuperGUI is an unsandboxed custom extension for building complete, interactive, stage-aligned interfaces in PenguinMod and TurboWarp. Panels are only one part of it: SuperGUI also includes form controls, game inputs, status widgets, media, animation, themes, persistence, and a visual editor.
+SuperGUI is an unsandboxed custom extension for building complete, interactive, stage-aligned interfaces in PenguinMod, TurboWarp, and Gandi IDE. Panels are only one part of it: SuperGUI also includes form controls, game inputs, status widgets, media, animation, themes, persistence, and a visual editor.
 
 It also includes optional achievements and leaderboards backed by local storage, Storage+, or Server Storage, plus integration with Free Servers for WebSocket availability checks. See [Game services](docs/GAME_SERVICES.md) for setup and limitations.
 
 ## Use the extension
 
-1. Download [`dist/supergui.js`](dist/supergui.js).
-2. In PenguinMod or TurboWarp, open **Add Extension** and choose **Custom Extension**.
-3. Select or host `supergui.js`, and enable **Run extension without sandbox**.
-4. Use **open SuperGUI editor** to create your interface, then click **Save** in the editor.
+### PenguinMod quick start
+
+Copy this URL:
+
+```text
+https://cdn.jsdelivr.net/gh/rogerdiffrient-coder/supergui@main/dist/supergui.js
+```
+
+1. Open the [PenguinMod editor](https://studio.penguinmod.com/editor.html).
+2. Click **Add Extension**, then **Custom Extension**.
+3. Paste the URL above into the extension URL field.
+4. Enable **Run extension without sandbox**, then load the extension.
+5. Use **open SuperGUI editor** to create your interface, then click **Save** in the editor.
+
+The CDN URL follows the latest version on the `main` branch, so projects loaded later may receive updates. To keep a project on an exact version, replace `@main` with a release tag or commit hash.
+
+### TurboWarp and Gandi IDE
+
+The same CDN URL works in the **Custom Extension** loader in TurboWarp and Gandi IDE. Enable the loader's unsandboxed option before loading it. You can also download [`dist/supergui.js`](dist/supergui.js) and host it yourself.
 
 Only `dist/supergui.js` needs to be uploaded to the extension loader. The files under `src/` are organized for development.
 
@@ -52,7 +67,7 @@ dist/supergui.js                 Ready-to-upload extension
 
 ## Compatibility
 
-SuperGUI targets modern browsers used by PenguinMod and TurboWarp. It must run unsandboxed. Standard Scratch does not support loading arbitrary custom JavaScript extensions.
+SuperGUI targets modern browsers used by PenguinMod, TurboWarp, and Gandi IDE. It must run unsandboxed. Standard Scratch does not support loading arbitrary custom JavaScript extensions.
 
 ## License
 
