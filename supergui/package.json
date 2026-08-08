@@ -1,0 +1,17 @@
+{
+  "name": "supergui-scratch-extension",
+  "version": "4.0.0",
+  "description": "A visual GUI builder extension for PenguinMod and TurboWarp.",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/build.mjs && node tests/project.test.mjs && node tests/game-services.test.mjs",
+    "test": "node tests/project.test.mjs && node tests/game-services.test.mjs",
+    "test:services": "node tests/game-services.test.mjs"
+  },
+  "files": [
+    "dist/supergui.js"
+  ]
+}
