@@ -6,6 +6,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildBundle, OUTPUT } from '../scripts/build.mjs';
+import { SuperGUI } from '../src/super-gui.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = file => readFile(path.join(ROOT, file), 'utf8');
@@ -27,7 +28,11 @@ const defaultTypes = new Set(matches(model, /case '([^']+)'/g));
 const editorTypes = new Set(matches(editor, /<option value="([^"]+)">/g));
 const renderer = runtime.slice(runtime.indexOf('_createElementDom'));
 const renderedTypes = new Set(matches(renderer, /case '([^']+)'/g));
+const paletteLabels = new Set(matches(runtime, /blockType: B\.LABEL, text: '─── ([^─]+?) ───'/g));
 
+assert.equal(SuperGUI.prototype._stateIsOn('on'), true);
+assert.equal(SuperGUI.prototype._stateIsOn('off'), false);
+assert.equal(SuperGUI.prototype._stateIsOn(true), true, 'Boolean reporters remain backwards-compatible with state dropdowns');
 assert.equal(bundle, await buildBundle(), 'dist/supergui.js is stale; run npm run build');
 assert.equal(opcodes.length, new Set(opcodes).size, 'duplicate Scratch opcode');
 assert.deepEqual([...new Set(opcodes)].filter(name => !methods.has(name)), [], 'a Scratch block has no matching method');
@@ -38,6 +43,12 @@ for (const id of ['g1nxBettererStorage', 'ikeleneServerStorage', 'FreeServers'])
   assert.ok(gameServices.includes(id), `missing companion adapter: ${id}`);
 }
 assert.ok((editor.match(/<optgroup/g) || []).length >= 4, 'editor element choices must be categorized');
+assert.ok(!runtime.includes('Element: specialized'), 'element-specific blocks must not be dumped into a specialized bucket');
+for (const category of ['Checkbox','Progress bar','Switch','Radio group','Selector grid','Counter','Badge','Spinner','Video','Rating','Health bar','Joystick','D-pad','Tabs','Knob','Carousel','Particles','Canvas','Tooltip']) {
+  assert.ok(paletteLabels.has(category), `missing block palette category: ${category}`);
+}
+assert.equal((runtime.match(/type: S\.BOOLEAN/g) || []).length, 0, 'state setters must use on/off dropdowns rather than Boolean text sockets');
+for (const menu of ['achievements','leaderboards','savedSlots','elementOptions','onOff']) assert.ok(runtime.includes(`${menu}: {`), `missing dynamic/categorical menu: ${menu}`);
 assert.match(editor, /'Default selected', 'select'/, 'choice defaults must use a dropdown in the editor');
 assert.match(editor, /wrapNode\.style\.transform='rotate\('/, 'rotation drag must update the live editor node');
 assert.doesNotMatch(editor.match(/function startRotate[\s\S]*?function m\(ev\)\{([^}]*)\}/)[1], /renderStage/, 'rotation drag must not replace its live node');

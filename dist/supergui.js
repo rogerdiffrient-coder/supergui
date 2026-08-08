@@ -1103,9 +1103,9 @@ class SuperGUI {
           { opcode: 'setPanelOpacity', blockType: B.COMMAND, text: 'set panel [P] opacity [O]', arguments: { P: str('panels'), O: num(1) } },
           { opcode: 'setPanelBackground', blockType: B.COMMAND, text: 'set panel [P] background [C]', arguments: { P: str('panels'), C: { type: S.COLOR } } },
           { opcode: 'setPanelBackgroundImage', blockType: B.COMMAND, text: 'set panel [P] background image [URL]', arguments: { P: str('panels'), URL: { type: S.STRING, defaultValue: '' } } },
-          { opcode: 'setPanelDraggable', blockType: B.COMMAND, text: 'set panel [P] draggable [D]', arguments: { P: str('panels'), D: { type: S.BOOLEAN } } },
-          { opcode: 'setPanelTitleBar', blockType: B.COMMAND, text: 'set panel [P] title bar [V]', arguments: { P: str('panels'), V: { type: S.BOOLEAN } } },
-          { opcode: 'setPanelModal', blockType: B.COMMAND, text: 'set panel [P] modal [M]', arguments: { P: str('panels'), M: { type: S.BOOLEAN } } },
+          { opcode: 'setPanelDraggable', blockType: B.COMMAND, text: 'set panel [P] draggable [D]', arguments: { P: str('panels'), D: str('onOff') } },
+          { opcode: 'setPanelTitleBar', blockType: B.COMMAND, text: 'set panel [P] title bar [V]', arguments: { P: str('panels'), V: str('onOff') } },
+          { opcode: 'setPanelModal', blockType: B.COMMAND, text: 'set panel [P] modal [M]', arguments: { P: str('panels'), M: str('onOff') } },
           { opcode: 'closeAllModals', blockType: B.COMMAND, text: 'close all modal panels' },
           { opcode: 'getAllPanelNames', blockType: B.REPORTER, text: 'all panel names' },
           { opcode: 'clearAllPanels', blockType: B.COMMAND, text: 'delete all panels' },
@@ -1133,8 +1133,8 @@ class SuperGUI {
           { opcode: 'getElementRotation', blockType: B.REPORTER, text: '[E] rotation', arguments: { E: str('elements') } },
           { opcode: 'bringElementToFront', blockType: B.COMMAND, text: 'bring [E] to front', arguments: { E: str('elements') } },
           { opcode: 'sendElementToBack', blockType: B.COMMAND, text: 'send [E] to back', arguments: { E: str('elements') } },
-          { opcode: 'setElementLocked', blockType: B.COMMAND, text: 'set [E] locked [L]', arguments: { E: str('elements'), L: { type: S.BOOLEAN } } },
-          { opcode: 'setElementRuntimeDraggable', blockType: B.COMMAND, text: 'set [E] player-draggable [D]', arguments: { E: str('elements'), D: { type: S.BOOLEAN } } },
+          { opcode: 'setElementLocked', blockType: B.COMMAND, text: 'set [E] locked [L]', arguments: { E: str('elements'), L: str('onOff') } },
+          { opcode: 'setElementRuntimeDraggable', blockType: B.COMMAND, text: 'set [E] player-draggable [D]', arguments: { E: str('elements'), D: str('onOff') } },
           { opcode: 'isElementBeingDragged', blockType: B.BOOLEAN, text: '[E] is being dragged?', arguments: { E: str('elements') } },
           { opcode: 'pinElementToEdge', blockType: B.COMMAND, text: 'pin [E] to [EDGE]', arguments: { E: str('elements'), EDGE: str('edges') } },
           { opcode: 'unpinElement', blockType: B.COMMAND, text: 'unpin [E]', arguments: { E: str('elements') } },
@@ -1144,14 +1144,14 @@ class SuperGUI {
           { blockType: B.LABEL, text: '─── Element: appearance ───' },
           { opcode: 'setElementOpacity', blockType: B.COMMAND, text: 'set [E] opacity [O]', arguments: { E: str('elements'), O: num(1) } },
           { opcode: 'getElementOpacity', blockType: B.REPORTER, text: '[E] opacity', arguments: { E: str('elements') } },
-          { opcode: 'setElementVisible', blockType: B.COMMAND, text: 'set [E] visible [V]', arguments: { E: str('elements'), V: { type: S.BOOLEAN } } },
+          { opcode: 'setElementVisible', blockType: B.COMMAND, text: 'set [E] visible [V]', arguments: { E: str('elements'), V: str('onOff') } },
           { opcode: 'isElementVisible', blockType: B.BOOLEAN, text: '[E] is visible?', arguments: { E: str('elements') } },
           { opcode: 'setElementColor', blockType: B.COMMAND, text: 'set [E] text color [C]', arguments: { E: str('elements'), C: { type: S.COLOR } } },
           { opcode: 'setElementBackgroundColor', blockType: B.COMMAND, text: 'set [E] background [C]', arguments: { E: str('elements'), C: { type: S.COLOR } } },
           { opcode: 'setElementBorderColor', blockType: B.COMMAND, text: 'set [E] border color [C]', arguments: { E: str('elements'), C: { type: S.COLOR } } },
           { opcode: 'setElementFontSize', blockType: B.COMMAND, text: 'set [E] font size [S]', arguments: { E: str('elements'), S: num(14) } },
           { opcode: 'setElementCursor', blockType: B.COMMAND, text: 'set [E] cursor [C]', arguments: { E: str('elements'), C: str('cursors') } },
-          { opcode: 'setElementDisabled', blockType: B.COMMAND, text: 'set [E] disabled [D]', arguments: { E: str('elements'), D: { type: S.BOOLEAN } } },
+          { opcode: 'setElementDisabled', blockType: B.COMMAND, text: 'set [E] disabled [D]', arguments: { E: str('elements'), D: str('onOff') } },
           { opcode: 'isElementDisabled', blockType: B.BOOLEAN, text: '[E] is disabled?', arguments: { E: str('elements') } },
           { opcode: 'setElementDisabledBackground', blockType: B.COMMAND, text: 'set [E] disabled background [C]', arguments: { E: str('elements'), C: { type: S.COLOR } } },
           { opcode: 'setElementSkin', blockType: B.COMMAND, text: 'set [E] 9-slice skin [URL] slice [S] width [W] repeat [R]', arguments: { E: str('elements'), URL: { type: S.STRING, defaultValue: '' }, S: num(16), W: num(8), R: str('skinRepeats') } },
@@ -1164,29 +1164,38 @@ class SuperGUI {
           { opcode: 'getElementValue', blockType: B.REPORTER, text: '[E] value', arguments: { E: str('elements') } },
           { opcode: 'setElementText', blockType: B.COMMAND, text: 'set [E] text [T]', arguments: { E: str('elements'), T: { type: S.STRING, defaultValue: 'Text' } } },
           { opcode: 'getElementText', blockType: B.REPORTER, text: '[E] text', arguments: { E: str('elements') } },
+          { blockType: B.LABEL, text: '─── Checkbox ───' },
+          { opcode: 'setCheckboxChecked', blockType: B.COMMAND, text: 'set checkbox [E] checked [STATE]', arguments: { E: str('elements'), STATE: str('onOff') } },
           { opcode: 'getSelectedOption', blockType: B.REPORTER, text: '[E] selected option', arguments: { E: str('elements') } },
           { opcode: 'isChecked', blockType: B.BOOLEAN, text: '[E] checked?', arguments: { E: str('elements') } },
+          { blockType: B.LABEL, text: '─── Dropdown / radio options ───' },
           { opcode: 'setDropdownOptions', blockType: B.COMMAND, text: 'set [E] options [LIST]', arguments: { E: str('elements'), LIST: { type: S.STRING, defaultValue: 'A, B, C' } } },
           { opcode: 'addDropdownOption', blockType: B.COMMAND, text: 'add option [O] to [E]', arguments: { E: str('elements'), O: { type: S.STRING, defaultValue: 'New' } } },
           { opcode: 'clearDropdownOptions', blockType: B.COMMAND, text: 'clear [E] options', arguments: { E: str('elements') } },
+          { blockType: B.LABEL, text: '─── Slider ───' },
           { opcode: 'setSliderRange', blockType: B.COMMAND, text: 'set [E] range [MIN] to [MAX]', arguments: { E: str('elements'), MIN: num(0), MAX: num(100) } },
           { opcode: 'setSliderStep', blockType: B.COMMAND, text: 'set [E] step [S]', arguments: { E: str('elements'), S: num(1) } },
+          { blockType: B.LABEL, text: '─── Image ───' },
           { opcode: 'setImageSource', blockType: B.COMMAND, text: 'set image [E] source [URL]', arguments: { E: str('elements'), URL: { type: S.STRING, defaultValue: '' } } },
-          { opcode: 'setImageFlipH', blockType: B.COMMAND, text: 'flip [E] horizontally [F]', arguments: { E: str('elements'), F: { type: S.BOOLEAN } } },
-          { opcode: 'setImageFlipV', blockType: B.COMMAND, text: 'flip [E] vertically [F]', arguments: { E: str('elements'), F: { type: S.BOOLEAN } } },
+          { opcode: 'setImageFlipH', blockType: B.COMMAND, text: 'flip [E] horizontally [F]', arguments: { E: str('elements'), F: str('onOff') } },
+          { opcode: 'setImageFlipV', blockType: B.COMMAND, text: 'flip [E] vertically [F]', arguments: { E: str('elements'), F: str('onOff') } },
           { opcode: 'setImageTint', blockType: B.COMMAND, text: 'set [E] tint [C]', arguments: { E: str('elements'), C: { type: S.COLOR } } },
 
-          { blockType: B.LABEL, text: '─── Element: specialized ───' },
+          { blockType: B.LABEL, text: '─── Progress bar ───' },
           { opcode: 'setProgressValue', blockType: B.COMMAND, text: 'set progress [E] value [V]', arguments: { E: str('elements'), V: num(50) } },
           { opcode: 'getProgressValue', blockType: B.REPORTER, text: 'progress [E] value', arguments: { E: str('elements') } },
-          { opcode: 'setSwitchOn', blockType: B.COMMAND, text: 'set switch [E] [ON]', arguments: { E: str('elements'), ON: { type: S.BOOLEAN } } },
+          { blockType: B.LABEL, text: '─── Switch ───' },
+          { opcode: 'setSwitchOn', blockType: B.COMMAND, text: 'set switch [E] [ON]', arguments: { E: str('elements'), ON: str('onOff') } },
           { opcode: 'toggleSwitch', blockType: B.COMMAND, text: 'toggle switch [E]', arguments: { E: str('elements') } },
           { opcode: 'isSwitchOn', blockType: B.BOOLEAN, text: 'switch [E] on?', arguments: { E: str('elements') } },
           { opcode: 'whenSwitchToggled', blockType: B.HAT, text: 'when switch [E] toggled', arguments: { E: str('elements') } },
-          { opcode: 'setRadioSelected', blockType: B.COMMAND, text: 'set radio [E] to [OPT]', arguments: { E: str('elements'), OPT: { type: S.STRING, defaultValue: 'A' } } },
+          { blockType: B.LABEL, text: '─── Radio group ───' },
+          { opcode: 'setRadioSelected', blockType: B.COMMAND, text: 'set radio [E] to [OPT]', arguments: { E: str('elements'), OPT: str('elementOptions') } },
           { opcode: 'getRadioSelected', blockType: B.REPORTER, text: 'radio [E] selected', arguments: { E: str('elements') } },
+          { blockType: B.LABEL, text: '─── Color picker ───' },
           { opcode: 'setColorPickerValue', blockType: B.COMMAND, text: 'set color picker [E] to [C]', arguments: { E: str('elements'), C: { type: S.COLOR } } },
           { opcode: 'getColorPickerValue', blockType: B.REPORTER, text: 'color picker [E] color', arguments: { E: str('elements') } },
+          { blockType: B.LABEL, text: '─── Selector grid ───' },
           { opcode: 'setSelectorSelected', blockType: B.COMMAND, text: 'set selector [E] to cell [I]', arguments: { E: str('elements'), I: num(0) } },
           { opcode: 'getSelectorSelected', blockType: B.REPORTER, text: 'selector [E] selected', arguments: { E: str('elements') } },
           { opcode: 'setSelectorCellImage', blockType: B.COMMAND, text: 'set selector [E] cell [I] image [URL]', arguments: { E: str('elements'), I: num(0), URL: { type: S.STRING, defaultValue: '' } } },
@@ -1194,20 +1203,26 @@ class SuperGUI {
           { opcode: 'populateSelector', blockType: B.COMMAND, text: 'populate selector [E] with [N] empty cells', arguments: { E: str('elements'), N: num(15) } },
           { opcode: 'clearSelector', blockType: B.COMMAND, text: 'clear selector [E]', arguments: { E: str('elements') } },
           { opcode: 'whenSelectorCellClicked', blockType: B.HAT, text: 'when selector [E] cell clicked', arguments: { E: str('elements') } },
+          { blockType: B.LABEL, text: '─── Counter ───' },
           { opcode: 'setCounterValue', blockType: B.COMMAND, text: 'set counter [E] to [V]', arguments: { E: str('elements'), V: num(0) } },
           { opcode: 'getCounterValue', blockType: B.REPORTER, text: 'counter [E] value', arguments: { E: str('elements') } },
           { opcode: 'incrementCounter', blockType: B.COMMAND, text: 'increment counter [E] by [N]', arguments: { E: str('elements'), N: num(1) } },
           { opcode: 'decrementCounter', blockType: B.COMMAND, text: 'decrement counter [E] by [N]', arguments: { E: str('elements'), N: num(1) } },
+          { blockType: B.LABEL, text: '─── Badge ───' },
           { opcode: 'setBadgeCount', blockType: B.COMMAND, text: 'set badge [E] count [N]', arguments: { E: str('elements'), N: num(0) } },
           { opcode: 'getBadgeCount', blockType: B.REPORTER, text: 'badge [E] count', arguments: { E: str('elements') } },
           { opcode: 'incrementBadge', blockType: B.COMMAND, text: 'increment badge [E]', arguments: { E: str('elements') } },
           { opcode: 'clearBadge', blockType: B.COMMAND, text: 'clear badge [E]', arguments: { E: str('elements') } },
+          { blockType: B.LABEL, text: '─── Spinner ───' },
           { opcode: 'showSpinner', blockType: B.COMMAND, text: 'show spinner [E]', arguments: { E: str('elements') } },
           { opcode: 'hideSpinner', blockType: B.COMMAND, text: 'hide spinner [E]', arguments: { E: str('elements') } },
+          { blockType: B.LABEL, text: '─── Video ───' },
           { opcode: 'playVideo', blockType: B.COMMAND, text: 'play video [E]', arguments: { E: str('elements') } },
           { opcode: 'pauseVideo', blockType: B.COMMAND, text: 'pause video [E]', arguments: { E: str('elements') } },
+          { blockType: B.LABEL, text: '─── Rating ───' },
           { opcode: 'setRatingValue', blockType: B.COMMAND, text: 'set rating [E] to [V]', arguments: { E: str('elements'), V: num(0) } },
           { opcode: 'getRatingValue', blockType: B.REPORTER, text: 'rating [E] value', arguments: { E: str('elements') } },
+          { blockType: B.LABEL, text: '─── Health bar ───' },
           { opcode: 'setHealthFilled', blockType: B.COMMAND, text: 'set health bar [E] filled to [N]', arguments: { E: str('elements'), N: num(10) } },
           { opcode: 'getHealthFilled', blockType: B.REPORTER, text: 'health bar [E] filled', arguments: { E: str('elements') } },
           { opcode: 'damageHealth', blockType: B.COMMAND, text: 'damage health bar [E] by [N]', arguments: { E: str('elements'), N: num(1) } },
@@ -1217,27 +1232,35 @@ class SuperGUI {
           { opcode: 'setHealthColors', blockType: B.COMMAND, text: 'set health bar [E] filled [F] empty [X] track [T]', arguments: { E: str('elements'), F: { type: S.COLOR }, X: { type: S.COLOR }, T: { type: S.COLOR } } },
           { opcode: 'setHealthArtMode', blockType: B.COMMAND, text: 'set health bar [E] art mode [M]', arguments: { E: str('elements'), M: str('healthArtModes') } },
           { opcode: 'setHealthArtPiece', blockType: B.COMMAND, text: 'set health bar [E] [P] art [URL]', arguments: { E: str('elements'), P: str('healthPieces'), URL: { type: S.STRING, defaultValue: '' } } },
+          { blockType: B.LABEL, text: '─── Joystick ───' },
           { opcode: 'getJoystickX', blockType: B.REPORTER, text: 'joystick [E] x', arguments: { E: str('elements') } },
           { opcode: 'getJoystickY', blockType: B.REPORTER, text: 'joystick [E] y', arguments: { E: str('elements') } },
           { opcode: 'getJoystickAngle', blockType: B.REPORTER, text: 'joystick [E] angle', arguments: { E: str('elements') } },
           { opcode: 'resetJoystick', blockType: B.COMMAND, text: 'reset joystick [E]', arguments: { E: str('elements') } },
+          { blockType: B.LABEL, text: '─── D-pad ───' },
           { opcode: 'getDPadDirection', blockType: B.REPORTER, text: 'dpad [E] direction', arguments: { E: str('elements') } },
           { opcode: 'resetDPad', blockType: B.COMMAND, text: 'reset dpad [E]', arguments: { E: str('elements') } },
+          { blockType: B.LABEL, text: '─── Tabs ───' },
           { opcode: 'setTabsActive', blockType: B.COMMAND, text: 'set tabs [E] active to [I]', arguments: { E: str('elements'), I: num(0) } },
           { opcode: 'getTabsActive', blockType: B.REPORTER, text: 'tabs [E] active', arguments: { E: str('elements') } },
+          { blockType: B.LABEL, text: '─── Knob ───' },
           { opcode: 'setKnobValue', blockType: B.COMMAND, text: 'set knob [E] to [V]', arguments: { E: str('elements'), V: num(0) } },
           { opcode: 'getKnobValue', blockType: B.REPORTER, text: 'knob [E] value', arguments: { E: str('elements') } },
+          { blockType: B.LABEL, text: '─── Carousel ───' },
           { opcode: 'nextCarouselSlide', blockType: B.COMMAND, text: 'next carousel [E] slide', arguments: { E: str('elements') } },
           { opcode: 'previousCarouselSlide', blockType: B.COMMAND, text: 'previous carousel [E] slide', arguments: { E: str('elements') } },
           { opcode: 'getCarouselCurrent', blockType: B.REPORTER, text: 'carousel [E] current', arguments: { E: str('elements') } },
-          { opcode: 'setCarouselAutoplay', blockType: B.COMMAND, text: 'set carousel [E] autoplay [B] [MS]ms', arguments: { E: str('elements'), B: { type: S.BOOLEAN }, MS: num(3000) } },
+          { opcode: 'setCarouselAutoplay', blockType: B.COMMAND, text: 'set carousel [E] autoplay [B] [MS]ms', arguments: { E: str('elements'), B: str('onOff'), MS: num(3000) } },
+          { blockType: B.LABEL, text: '─── Particles ───' },
           { opcode: 'emitParticles', blockType: B.COMMAND, text: 'emit particles from [E]', arguments: { E: str('elements') } },
           { opcode: 'clearParticles', blockType: B.COMMAND, text: 'clear particles [E]', arguments: { E: str('elements') } },
+          { blockType: B.LABEL, text: '─── Canvas ───' },
           { opcode: 'canvasClear', blockType: B.COMMAND, text: 'clear canvas [E]', arguments: { E: str('elements') } },
           { opcode: 'canvasDrawRect', blockType: B.COMMAND, text: 'rect on [E] x:[X] y:[Y] w:[W] h:[H] [C]', arguments: { E: str('elements'), X: num(0), Y: num(0), W: num(20), H: num(20), C: { type: S.COLOR } } },
           { opcode: 'canvasDrawCircle', blockType: B.COMMAND, text: 'circle on [E] x:[X] y:[Y] r:[R] [C]', arguments: { E: str('elements'), X: num(50), Y: num(50), R: num(10), C: { type: S.COLOR } } },
           { opcode: 'canvasDrawLine', blockType: B.COMMAND, text: 'line on [E] x1:[X1] y1:[Y1] x2:[X2] y2:[Y2] [C]', arguments: { E: str('elements'), X1: num(0), Y1: num(0), X2: num(100), Y2: num(100), C: { type: S.COLOR } } },
           { opcode: 'canvasDrawText', blockType: B.COMMAND, text: 'text on [E] x:[X] y:[Y] [T] [C] size [S]', arguments: { E: str('elements'), X: num(10), Y: num(20), T: { type: S.STRING, defaultValue: 'Hi' }, C: { type: S.COLOR }, S: num(16) } },
+          { blockType: B.LABEL, text: '─── Tooltip ───' },
           { opcode: 'showTooltip', blockType: B.COMMAND, text: 'show tooltip [E]', arguments: { E: str('elements') } },
           { opcode: 'hideTooltip', blockType: B.COMMAND, text: 'hide tooltip [E]', arguments: { E: str('elements') } },
 
@@ -1293,29 +1316,29 @@ class SuperGUI {
 
           { blockType: B.LABEL, text: '─── Achievements ───' },
           { opcode: 'defineAchievement', blockType: B.COMMAND, text: 'define achievement [A] title [T] description [D] points [P] target [G]', arguments: { A: { type: S.STRING, defaultValue: 'first-win' }, T: { type: S.STRING, defaultValue: 'First Win' }, D: { type: S.STRING, defaultValue: 'Win your first match' }, P: num(10), G: num(1) } },
-          { opcode: 'setAchievementIcon', blockType: B.COMMAND, text: 'set achievement [A] icon [I]', arguments: { A: { type: S.STRING, defaultValue: 'first-win' }, I: { type: S.STRING, defaultValue: '🏆' } } },
-          { opcode: 'setAchievementSecret', blockType: B.COMMAND, text: 'set achievement [A] secret [S]', arguments: { A: { type: S.STRING, defaultValue: 'first-win' }, S: { type: S.BOOLEAN } } },
-          { opcode: 'unlockAchievement', blockType: B.COMMAND, text: 'unlock achievement [A]', arguments: { A: { type: S.STRING, defaultValue: 'first-win' } } },
-          { opcode: 'setAchievementProgress', blockType: B.COMMAND, text: 'set achievement [A] progress [P]', arguments: { A: { type: S.STRING, defaultValue: 'first-win' }, P: num(1) } },
-          { opcode: 'isAchievementUnlocked', blockType: B.BOOLEAN, text: 'achievement [A] unlocked?', arguments: { A: { type: S.STRING, defaultValue: 'first-win' } } },
-          { opcode: 'getAchievementProgress', blockType: B.REPORTER, text: 'achievement [A] progress', arguments: { A: { type: S.STRING, defaultValue: 'first-win' } } },
+          { opcode: 'setAchievementIcon', blockType: B.COMMAND, text: 'set achievement [A] icon [I]', arguments: { A: str('achievements'), I: { type: S.STRING, defaultValue: '🏆' } } },
+          { opcode: 'setAchievementSecret', blockType: B.COMMAND, text: 'set achievement [A] secret [S]', arguments: { A: str('achievements'), S: str('onOff') } },
+          { opcode: 'unlockAchievement', blockType: B.COMMAND, text: 'unlock achievement [A]', arguments: { A: str('achievements') } },
+          { opcode: 'setAchievementProgress', blockType: B.COMMAND, text: 'set achievement [A] progress [P]', arguments: { A: str('achievements'), P: num(1) } },
+          { opcode: 'isAchievementUnlocked', blockType: B.BOOLEAN, text: 'achievement [A] unlocked?', arguments: { A: str('achievements') } },
+          { opcode: 'getAchievementProgress', blockType: B.REPORTER, text: 'achievement [A] progress', arguments: { A: str('achievements') } },
           { opcode: 'getAchievementPoints', blockType: B.REPORTER, text: 'player achievement points' },
           { opcode: 'getAchievementDefinitions', blockType: B.REPORTER, text: 'achievement definitions' },
-          { opcode: 'showAchievementInElement', blockType: B.COMMAND, text: 'show achievement [A] in UI element [E]', arguments: { A: { type: S.STRING, defaultValue: 'first-win' }, E: str('elements') } },
+          { opcode: 'showAchievementInElement', blockType: B.COMMAND, text: 'show achievement [A] in UI element [E]', arguments: { A: str('achievements'), E: str('elements') } },
           { opcode: 'setAchievementPopups', blockType: B.COMMAND, text: 'set achievement popups [STATE]', arguments: { STATE: str('onOff') } },
           { opcode: 'setAchievementPopupAnimation', blockType: B.COMMAND, text: 'set achievement popup animation [ANIMATION]', arguments: { ANIMATION: str('popupAnimations') } },
           { opcode: 'setAchievementPopupDuration', blockType: B.COMMAND, text: 'set achievement popup duration [SECONDS] seconds', arguments: { SECONDS: num(3) } },
-          { opcode: 'showAchievementPopup', blockType: B.COMMAND, text: 'show popup for achievement [A]', arguments: { A: { type: S.STRING, defaultValue: 'first-win' } } },
-          { opcode: 'whenAchievementUnlocked', blockType: B.HAT, text: 'when achievement [A] unlocked', arguments: { A: { type: S.STRING, defaultValue: 'first-win' } } },
+          { opcode: 'showAchievementPopup', blockType: B.COMMAND, text: 'show popup for achievement [A]', arguments: { A: str('achievements') } },
+          { opcode: 'whenAchievementUnlocked', blockType: B.HAT, text: 'when achievement [A] unlocked', arguments: { A: str('achievements') } },
 
           { blockType: B.LABEL, text: '─── Leaderboards ───' },
           { opcode: 'submitLeaderboardScore', blockType: B.COMMAND, text: 'submit score [S] to [B] using [M]', arguments: { S: num(100), B: { type: S.STRING, defaultValue: 'main' }, M: str('scoreModes') } },
-          { opcode: 'getLeaderboard', blockType: B.REPORTER, text: 'leaderboard [B] as JSON', arguments: { B: { type: S.STRING, defaultValue: 'main' } } },
-          { opcode: 'getLeaderboardRank', blockType: B.REPORTER, text: 'player rank on [B]', arguments: { B: { type: S.STRING, defaultValue: 'main' } } },
-          { opcode: 'getLeaderboardPlayer', blockType: B.REPORTER, text: 'player at rank [R] on [B]', arguments: { R: num(1), B: { type: S.STRING, defaultValue: 'main' } } },
-          { opcode: 'getLeaderboardScore', blockType: B.REPORTER, text: 'score at rank [R] on [B]', arguments: { R: num(1), B: { type: S.STRING, defaultValue: 'main' } } },
-          { opcode: 'refreshLeaderboardElement', blockType: B.COMMAND, text: 'show leaderboard [B] in UI element [E]', arguments: { B: { type: S.STRING, defaultValue: 'main' }, E: str('elements') } },
-          { opcode: 'whenLeaderboardUpdated', blockType: B.HAT, text: 'when leaderboard [B] updated', arguments: { B: { type: S.STRING, defaultValue: 'main' } } },
+          { opcode: 'getLeaderboard', blockType: B.REPORTER, text: 'leaderboard [B] as JSON', arguments: { B: str('leaderboards') } },
+          { opcode: 'getLeaderboardRank', blockType: B.REPORTER, text: 'player rank on [B]', arguments: { B: str('leaderboards') } },
+          { opcode: 'getLeaderboardPlayer', blockType: B.REPORTER, text: 'player at rank [R] on [B]', arguments: { R: num(1), B: str('leaderboards') } },
+          { opcode: 'getLeaderboardScore', blockType: B.REPORTER, text: 'score at rank [R] on [B]', arguments: { R: num(1), B: str('leaderboards') } },
+          { opcode: 'refreshLeaderboardElement', blockType: B.COMMAND, text: 'show leaderboard [B] in UI element [E]', arguments: { B: str('leaderboards'), E: str('elements') } },
+          { opcode: 'whenLeaderboardUpdated', blockType: B.HAT, text: 'when leaderboard [B] updated', arguments: { B: str('leaderboards') } },
 
           { blockType: B.LABEL, text: '─── Events ───' },
           { opcode: 'whenButtonClicked', blockType: B.HAT, text: 'when [E] clicked', arguments: { E: str('elements') } },
@@ -1336,12 +1359,16 @@ class SuperGUI {
           { opcode: 'exportGUI', blockType: B.REPORTER, text: 'export GUI config' },
           { opcode: 'importGUI', blockType: B.COMMAND, text: 'import GUI config [D]', arguments: { D: { type: S.STRING, defaultValue: '{}' } } },
           { opcode: 'saveGUIAs', blockType: B.COMMAND, text: 'save as slot [S]', arguments: { S: { type: S.STRING, defaultValue: 'level1' } } },
-          { opcode: 'loadGUIFrom', blockType: B.COMMAND, text: 'load slot [S]', arguments: { S: { type: S.STRING, defaultValue: 'level1' } } },
+          { opcode: 'loadGUIFrom', blockType: B.COMMAND, text: 'load slot [S]', arguments: { S: str('savedSlots') } },
           { opcode: 'listSavedSlots', blockType: B.REPORTER, text: 'saved slots' },
-          { opcode: 'deleteSavedSlot', blockType: B.COMMAND, text: 'delete slot [S]', arguments: { S: { type: S.STRING, defaultValue: 'level1' } } }
+          { opcode: 'deleteSavedSlot', blockType: B.COMMAND, text: 'delete slot [S]', arguments: { S: str('savedSlots') } }
         ],
         menus: {
           panels: { acceptReporters: true, items: 'getPanelMenu' },
+          achievements: { acceptReporters: true, items: 'getAchievementMenu' },
+          leaderboards: { acceptReporters: true, items: 'getLeaderboardMenu' },
+          savedSlots: { acceptReporters: true, items: 'getSavedSlotMenu' },
+          elementOptions: { acceptReporters: true, items: 'getElementOptionMenu' },
           elements: { acceptReporters: true, items: 'getElementMenu' },
           elementTypes: { acceptReporters: false, items: ELEMENT_TYPES },
           easings: { acceptReporters: false, items: ['linear','easeIn','easeOut','easeInOut','easeInCubic','easeOutCubic','easeInOutCubic','easeInBack','easeOutBack','easeOutBounce','easeOutElastic'] },
@@ -1357,13 +1384,18 @@ class SuperGUI {
           skinRepeats: { acceptReporters: false, items: ['stretch','round','repeat','space'] },
           healthArtModes: { acceptReporters: false, items: ['image','builtIn','none'] },
           healthPieces: { acceptReporters: false, items: ['left','middle','right'] },
-          onOff: { acceptReporters: false, items: ['on','off'] },
+          onOff: { acceptReporters: true, items: ['on','off'] },
           popupAnimations: { acceptReporters: false, items: ['slide','pop','bounce','fade','none'] }
         }
       };
     }
 
+    _stateIsOn(value) { return value === true || String(value).toLowerCase() === 'true' || String(value).toLowerCase() === 'on'; }
     getPanelMenu() { const n = this.config.panelOrder.map(k => this.config.panels[k] && this.config.panels[k].name).filter(Boolean); return n.length ? n : ['(no panels)']; }
+    getAchievementMenu() { const ids = Object.keys(this.gameServices.achievements); return ids.length ? ids : ['(no achievements)']; }
+    getLeaderboardMenu() { const ids = Object.keys(this.gameServices.boardCache); return ids.length ? ids : ['main']; }
+    getSavedSlotMenu() { const value = this.listSavedSlots(); return value ? value.split(', ') : ['(no saved slots)']; }
+    getElementOptionMenu() { const options = new Set(); for (const k of this.config.panelOrder) { const p = this.config.panels[k]; if (!p) continue; for (const id of p.elementOrder) { const el = p.elements[id]; if (el && Array.isArray(el.options)) el.options.forEach(option => options.add(String(option))); } } return options.size ? [...options] : ['(no options)']; }
     getElementMenu() { const n = []; for (const k of this.config.panelOrder) { const p = this.config.panels[k]; if (p) for (const id of p.elementOrder) n.push(id); } return n.length ? n : ['(no elements)']; }
     _findPanelKeyByName(name) { for (const k of this.config.panelOrder) { const p = this.config.panels[k]; if (p && p.name === name) return k; } return null; }
     _findElement(id) { for (const k of this.config.panelOrder) { const p = this.config.panels[k]; if (p && p.elements[id]) return { panelKey: k, panel: p, el: p.elements[id] }; } return null; }
@@ -1391,9 +1423,9 @@ class SuperGUI {
     setPanelOpacity(a) { const k = this._findPanelKeyByName(a.P); if (!k) return; this.config.panels[k].style.opacity = Number(a.O); this._renderPanel(k); }
     setPanelBackground(a) { const k = this._findPanelKeyByName(a.P); if (!k) return; this.config.panels[k].style.background = a.C; this._renderPanel(k); }
     setPanelBackgroundImage(a) { const k = this._findPanelKeyByName(a.P); if (!k) return; this.config.panels[k].backgroundImage = a.URL; this._renderPanel(k); }
-    setPanelDraggable(a) { const k = this._findPanelKeyByName(a.P); if (!k) return; this.config.panels[k].draggable = !!a.D; this._renderPanel(k); }
-    setPanelTitleBar(a) { const k = this._findPanelKeyByName(a.P); if (!k) return; this.config.panels[k].titleBar = !!a.V; this._renderPanel(k); }
-    setPanelModal(a) { const k = this._findPanelKeyByName(a.P); if (!k) return; this.config.panels[k].modal = !!a.M; this._renderPanel(k); }
+    setPanelDraggable(a) { const k = this._findPanelKeyByName(a.P); if (!k) return; this.config.panels[k].draggable = this._stateIsOn(a.D); this._renderPanel(k); }
+    setPanelTitleBar(a) { const k = this._findPanelKeyByName(a.P); if (!k) return; this.config.panels[k].titleBar = this._stateIsOn(a.V); this._renderPanel(k); }
+    setPanelModal(a) { const k = this._findPanelKeyByName(a.P); if (!k) return; this.config.panels[k].modal = this._stateIsOn(a.M); this._renderPanel(k); }
     closeAllModals() { for (const k of this.config.panelOrder) { if (this.config.panels[k].modal) { this.config.panels[k].visible = false; this._renderPanel(k); } } }
     getAllPanelNames() { return this.config.panelOrder.map(k => this.config.panels[k].name).join(', '); }
     clearAllPanels() { this._replaceConfig(defaultConfig()); }
@@ -1454,8 +1486,8 @@ class SuperGUI {
     getElementRotation(a) { const f = this._findElement(a.E); return f ? f.el.rotation : 0; }
     bringElementToFront(a) { const f = this._findElement(a.E); if (!f) return; f.el.zIndex = this._nextZ(); this._renderPanel(f.panelKey); }
     sendElementToBack(a) { const f = this._findElement(a.E); if (!f) return; f.el.zIndex = 0; this._renderPanel(f.panelKey); }
-    setElementLocked(a) { const f = this._findElement(a.E); if (!f) return; f.el.locked = !!a.L; }
-    setElementRuntimeDraggable(a) { const f = this._findElement(a.E); if (!f) return; f.el.runtimeDraggable = !!a.D; this._renderPanel(f.panelKey); }
+    setElementLocked(a) { const f = this._findElement(a.E); if (!f) return; f.el.locked = this._stateIsOn(a.L); }
+    setElementRuntimeDraggable(a) { const f = this._findElement(a.E); if (!f) return; f.el.runtimeDraggable = this._stateIsOn(a.D); this._renderPanel(f.panelKey); }
     isElementBeingDragged(a) { return this._draggingElements.has(a.E); }
     pinElementToEdge(a) { const f = this._findElement(a.E); if (!f) return; this._pinnedElements[a.E] = a.EDGE; this._updatePin(a.E); this._renderPanel(f.panelKey); }
     unpinElement(a) { delete this._pinnedElements[a.E]; const f = this._findElement(a.E); if (f) this._renderPanel(f.panelKey); }
@@ -1486,14 +1518,14 @@ class SuperGUI {
     // =================== ELEMENT APPEARANCE ===================
     setElementOpacity(a) { const f = this._findElement(a.E); if (!f) return; f.el.style.opacity = Number(a.O); this._renderPanel(f.panelKey); }
     getElementOpacity(a) { const f = this._findElement(a.E); return f ? f.el.style.opacity : 1; }
-    setElementVisible(a) { const f = this._findElement(a.E); if (!f) return; f.el.hidden = !a.V; this._renderPanel(f.panelKey); }
+    setElementVisible(a) { const f = this._findElement(a.E); if (!f) return; f.el.hidden = !this._stateIsOn(a.V); this._renderPanel(f.panelKey); }
     isElementVisible(a) { const f = this._findElement(a.E); return f ? !f.el.hidden : false; }
     setElementColor(a) { const f = this._findElement(a.E); if (!f) return; f.el.style.color = a.C; this._renderPanel(f.panelKey); }
     setElementBackgroundColor(a) { const f = this._findElement(a.E); if (!f) return; f.el.style.background = a.C; this._renderPanel(f.panelKey); }
     setElementBorderColor(a) { const f = this._findElement(a.E); if (!f) return; f.el.style.borderColor = a.C; this._renderPanel(f.panelKey); }
     setElementFontSize(a) { const f = this._findElement(a.E); if (!f) return; f.el.style.fontSize = Number(a.S); this._renderPanel(f.panelKey); }
     setElementCursor(a) { const f = this._findElement(a.E); if (!f) return; f.el.cursor = a.C; this._renderPanel(f.panelKey); }
-    setElementDisabled(a) { const f = this._findElement(a.E); if (!f) return; f.el.disabled = !!a.D; this._renderPanel(f.panelKey); }
+    setElementDisabled(a) { const f = this._findElement(a.E); if (!f) return; f.el.disabled = this._stateIsOn(a.D); this._renderPanel(f.panelKey); }
     isElementDisabled(a) { const f = this._findElement(a.E); return f ? !!f.el.disabled : false; }
     setElementDisabledBackground(a) { const f = this._findElement(a.E); if (!f) return; f.el.disabledBg = a.C; this._renderPanel(f.panelKey); }
     setElementSkin(a) { const f = this._findElement(a.E); if (!f) return; f.el.skin = { url:String(a.URL || ''), slice:Math.max(0, Number(a.S) || 0), width:Math.max(0, Number(a.W) || 0), repeat:String(a.R || 'stretch') }; this._renderPanel(f.panelKey); }
@@ -1532,6 +1564,7 @@ class SuperGUI {
     }
     setElementText(a) { const f = this._findElement(a.E); if (!f || !('text' in f.el)) return; f.el.text = String(a.T); this._renderPanel(f.panelKey); }
     getElementText(a) { const f = this._findElement(a.E); return f && 'text' in f.el ? f.el.text : ''; }
+    setCheckboxChecked(a) { const f = this._findElement(a.E); if (!f || f.el.type !== 'checkbox') return; f.el.checked = this._stateIsOn(a.STATE); this._renderPanel(f.panelKey); }
     getSelectedOption(a) { const f = this._findElement(a.E); return f && (f.el.type === 'dropdown' || f.el.type === 'radio') ? f.el.selected : ''; }
     isChecked(a) { const f = this._findElement(a.E); return !!(f && f.el.type === 'checkbox' && f.el.checked); }
     setDropdownOptions(a) {
@@ -1545,14 +1578,14 @@ class SuperGUI {
     setSliderRange(a) { const f = this._findElement(a.E); if (!f) return; f.el.min = Number(a.MIN); f.el.max = Number(a.MAX); this._renderPanel(f.panelKey); }
     setSliderStep(a) { const f = this._findElement(a.E); if (!f) return; f.el.step = Number(a.S); this._renderPanel(f.panelKey); }
     setImageSource(a) { const f = this._findElement(a.E); if (!f) return; if (f.el.type === 'image' || f.el.type === 'background') f.el.src = a.URL; else if (f.el.type === 'imagebutton') f.el.image = a.URL; this._renderPanel(f.panelKey); }
-    setImageFlipH(a) { const f = this._findElement(a.E); if (!f || f.el.type !== 'image') return; f.el.flipH = !!a.F; this._renderPanel(f.panelKey); }
-    setImageFlipV(a) { const f = this._findElement(a.E); if (!f || f.el.type !== 'image') return; f.el.flipV = !!a.F; this._renderPanel(f.panelKey); }
+    setImageFlipH(a) { const f = this._findElement(a.E); if (!f || f.el.type !== 'image') return; f.el.flipH = this._stateIsOn(a.F); this._renderPanel(f.panelKey); }
+    setImageFlipV(a) { const f = this._findElement(a.E); if (!f || f.el.type !== 'image') return; f.el.flipV = this._stateIsOn(a.F); this._renderPanel(f.panelKey); }
     setImageTint(a) { const f = this._findElement(a.E); if (!f || f.el.type !== 'image') return; f.el.tint = a.C; this._renderPanel(f.panelKey); }
 
-    // =================== ELEMENT SPECIALIZED ===================
+    // =================== ELEMENT-SPECIFIC CONTROLS ===================
     setProgressValue(a) { const f = this._findElement(a.E); if (!f || f.el.type !== 'progressbar') return; f.el.value = Number(a.V); this._renderPanel(f.panelKey); }
     getProgressValue(a) { const f = this._findElement(a.E); return f && f.el.type === 'progressbar' ? f.el.value : 0; }
-    setSwitchOn(a) { const f = this._findElement(a.E); if (!f || f.el.type !== 'switch') return; f.el.on = !!a.ON; this._renderPanel(f.panelKey); this.runtime.startHats(EXT_ID + '_whenSwitchToggled', { E: a.E }); }
+    setSwitchOn(a) { const f = this._findElement(a.E); if (!f || f.el.type !== 'switch') return; f.el.on = this._stateIsOn(a.ON); this._renderPanel(f.panelKey); this.runtime.startHats(EXT_ID + '_whenSwitchToggled', { E: a.E }); }
     toggleSwitch(a) { const f = this._findElement(a.E); if (!f || f.el.type !== 'switch') return; f.el.on = !f.el.on; this._renderPanel(f.panelKey); this.runtime.startHats(EXT_ID + '_whenSwitchToggled', { E: a.E }); }
     isSwitchOn(a) { const f = this._findElement(a.E); return !!(f && f.el.type === 'switch' && f.el.on); }
     whenSwitchToggled() { return false; }
@@ -1610,7 +1643,7 @@ class SuperGUI {
     getCarouselCurrent(a) { const f = this._findElement(a.E); return f && f.el.type === 'carousel' ? f.el.current : 0; }
     setCarouselAutoplay(a) {
       const f = this._findElement(a.E); if (!f || f.el.type !== 'carousel') return;
-      f.el.autoPlay = !!a.B; f.el.interval = Number(a.MS);
+      f.el.autoPlay = this._stateIsOn(a.B); f.el.interval = Number(a.MS);
       if (this._carouselTimers[a.E]) clearInterval(this._carouselTimers[a.E]);
       delete this._carouselTimers[a.E];
       if (f.el.autoPlay) {
@@ -1835,7 +1868,7 @@ class SuperGUI {
     isCloudServerUp(a) { return this.gameServices.pingServer(a.URL); }
     defineAchievement(a) { this.gameServices.defineAchievement(a.A, a.T, a.D, a.P, a.G); }
     setAchievementIcon(a) { this.gameServices.setAchievementIcon(a.A, a.I); }
-    setAchievementSecret(a) { this.gameServices.setAchievementSecret(a.A, a.S); }
+    setAchievementSecret(a) { this.gameServices.setAchievementSecret(a.A, this._stateIsOn(a.S)); }
     unlockAchievement(a) { return this.gameServices.unlock(a.A); }
     setAchievementProgress(a) { return this.gameServices.setProgress(a.A, a.P); }
     async isAchievementUnlocked(a) { return !!(await this.gameServices.achievementState(a.A)).unlockedAt; }
@@ -1849,7 +1882,7 @@ class SuperGUI {
       Object.assign(f.el, achievement, { achievementId:achievement.id, progress:state.progress || 0, unlocked:!!state.unlockedAt });
       this._renderPanel(f.panelKey);
     }
-    setAchievementPopups(a) { this._achievementPopup.enabled = String(a.STATE).toLowerCase() !== 'off'; }
+    setAchievementPopups(a) { this._achievementPopup.enabled = this._stateIsOn(a.STATE); }
     setAchievementPopupAnimation(a) {
       const animation = String(a.ANIMATION || 'slide');
       this._achievementPopup.animation = ['slide','pop','bounce','fade','none'].includes(animation) ? animation : 'slide';
