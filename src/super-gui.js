@@ -880,7 +880,10 @@ export class SuperGUI {
     _buildOverlay() {
       const o = document.createElement('div');
       o.id = 'supergui-overlay';
-      o.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;overflow:hidden;z-index:1000;';
+      // Keep the GUI on the same 480x360 coordinate system as the Scratch stage.
+      // Scaling the whole layer (instead of merely resizing it) also scales fonts,
+      // borders and spacing, so fullscreen is an exact, sharper enlargement.
+      o.style.cssText = 'position:absolute;top:0;left:0;width:480px;height:360px;transform-origin:top left;pointer-events:none;overflow:hidden;z-index:1000;';
       document.body.appendChild(o);
       this.overlay = o;
     }
@@ -890,8 +893,7 @@ export class SuperGUI {
       const r = c.getBoundingClientRect();
       this.overlay.style.left = (r.left + window.scrollX) + 'px';
       this.overlay.style.top = (r.top + window.scrollY) + 'px';
-      this.overlay.style.width = r.width + 'px';
-      this.overlay.style.height = r.height + 'px';
+      this.overlay.style.transform = 'scale(' + (r.width / 480) + ',' + (r.height / 360) + ')';
     }
     _renderAll() { this.overlay.innerHTML = ''; this.panelDoms = {}; this.elementDoms = {}; for (const k of this.config.panelOrder) this._renderPanel(k); }
     _stagePixelSize() { const r = this.overlay.getBoundingClientRect(); return { w: r.width, h: r.height }; }

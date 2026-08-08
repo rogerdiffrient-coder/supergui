@@ -644,7 +644,7 @@ select#addElementType option { color:var(--text); font-weight:400; }
         if (el.options.indexOf(el.selected)===-1) el.selected=el.options[0]||'';
         renderStage();
       });
-      addField(container, 'Default selected', 'text', el.selected, function(v){el.selected=v;});
+      addField(container, 'Default selected', 'select', el.selected, function(v){el.selected=v;}, el.options||[]);
       if (t==='radio') addField(container, 'Orientation', 'select', el.orientation, function(v){el.orientation=v;}, ['vertical','horizontal']);
     }
     if (t==='textinput'||t==='search') {
@@ -919,7 +919,7 @@ select#addElementType option { color:var(--text); font-weight:400; }
   function stagePx() { var s=document.getElementById('stage'); return {w:s.clientWidth, h:s.clientHeight}; }
   function startDrag(e, p, el) { var sx=e.clientX, sy=e.clientY, ox=el.x, oy=el.y, sz=stagePx(), pw=sz.w*p.width/100, ph=sz.h*p.height/100; function m(ev){ var dx=(ev.clientX-sx)/pw*100, dy=(ev.clientY-sy)/ph*100; el.x=Math.max(0,Math.min(100-el.width,ox+dx)); el.y=Math.max(0,Math.min(100-el.height,oy+dy)); renderStage(); } function u(){ document.removeEventListener('mousemove',m); document.removeEventListener('mouseup',u); renderProps(); } document.addEventListener('mousemove',m); document.addEventListener('mouseup',u); }
   function startResize(e, p, el) { var sx=e.clientX, sy=e.clientY, ow=el.width, oh=el.height, sz=stagePx(), pw=sz.w*p.width/100, ph=sz.h*p.height/100; function m(ev){ var dw=(ev.clientX-sx)/pw*100, dh=(ev.clientY-sy)/ph*100; el.width=Math.max(4,Math.min(100-el.x,ow+dw)); el.height=Math.max(4,Math.min(100-el.y,oh+dh)); renderStage(); } function u(){ document.removeEventListener('mousemove',m); document.removeEventListener('mouseup',u); renderProps(); } document.addEventListener('mousemove',m); document.addEventListener('mouseup',u); }
-  function startRotate(e, p, el, wrapNode) { var r=wrapNode.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2; function a(ev){ return Math.atan2(ev.clientY-cy, ev.clientX-cx)*180/Math.PI+90; } function m(ev){ el.rotation=Math.round(a(ev)); renderStage(); } function u(){ document.removeEventListener('mousemove',m); document.removeEventListener('mouseup',u); renderProps(); } document.addEventListener('mousemove',m); document.addEventListener('mouseup',u); }
+  function startRotate(e, p, el, wrapNode) { var r=wrapNode.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2; function a(ev){ return Math.atan2(ev.clientY-cy, ev.clientX-cx)*180/Math.PI+90; } function m(ev){ el.rotation=Math.round(a(ev)); wrapNode.style.transform='rotate('+el.rotation+'deg)'; } function u(){ document.removeEventListener('mousemove',m); document.removeEventListener('mouseup',u); renderStage(); renderProps(); } document.addEventListener('mousemove',m); document.addEventListener('mouseup',u); }
 
   function renderProps() {
     var props=document.getElementById('props'); props.innerHTML='';
@@ -1903,7 +1903,10 @@ class SuperGUI {
     _buildOverlay() {
       const o = document.createElement('div');
       o.id = 'supergui-overlay';
-      o.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;overflow:hidden;z-index:1000;';
+      // Keep the GUI on the same 480x360 coordinate system as the Scratch stage.
+      // Scaling the whole layer (instead of merely resizing it) also scales fonts,
+      // borders and spacing, so fullscreen is an exact, sharper enlargement.
+      o.style.cssText = 'position:absolute;top:0;left:0;width:480px;height:360px;transform-origin:top left;pointer-events:none;overflow:hidden;z-index:1000;';
       document.body.appendChild(o);
       this.overlay = o;
     }
@@ -1913,8 +1916,7 @@ class SuperGUI {
       const r = c.getBoundingClientRect();
       this.overlay.style.left = (r.left + window.scrollX) + 'px';
       this.overlay.style.top = (r.top + window.scrollY) + 'px';
-      this.overlay.style.width = r.width + 'px';
-      this.overlay.style.height = r.height + 'px';
+      this.overlay.style.transform = 'scale(' + (r.width / 480) + ',' + (r.height / 360) + ')';
     }
     _renderAll() { this.overlay.innerHTML = ''; this.panelDoms = {}; this.elementDoms = {}; for (const k of this.config.panelOrder) this._renderPanel(k); }
     _stagePixelSize() { const r = this.overlay.getBoundingClientRect(); return { w: r.width, h: r.height }; }
