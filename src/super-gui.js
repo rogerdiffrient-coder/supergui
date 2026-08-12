@@ -40,6 +40,8 @@ export class SuperGUI {
       window.addEventListener('resize', () => this._syncOverlayPosition());
       document.addEventListener('mousemove', (e) => { this._lastMouseX = e.clientX; this._lastMouseY = e.clientY; });
       window.__superGUIInstance = this;
+      this._ensureEmbeddedEditor();
+      this._restoreEmbeddedEditor();
       this._startRAF();
     }
 
@@ -51,8 +53,6 @@ export class SuperGUI {
       return {
         id: EXT_ID, name: 'SuperGUI', color1: '#5B6EE1', color2: '#4756B8', color3: '#38408C',
         blocks: [
-          { opcode: 'openEditor', blockType: B.COMMAND, text: 'open SuperGUI editor' },
-
           { blockType: B.LABEL, text: '─── Panel ───' },
           { opcode: 'showPanel', blockType: B.COMMAND, text: 'show panel [P]', arguments: { P: str('panels') } },
           { opcode: 'hidePanel', blockType: B.COMMAND, text: 'hide panel [P]', arguments: { P: str('panels') } },

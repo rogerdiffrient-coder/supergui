@@ -433,7 +433,7 @@ select#addElementType option { color:var(--text); font-weight:400; }
   <button id="btnImport">Import</button>
   <button id="btnExport">Export</button>
   <button id="btnSave" class="primary">Save</button>
-  <button id="btnMin" class="chrome" title="Minimize">_</button>
+  <button id="btnMin" class="chrome" title="Minimize">-</button>
   <button id="btnClose" class="chrome danger" title="Close" style="display:none">×</button>
   <input type="file" id="fileImport" accept="application/json">
 </header>
@@ -487,7 +487,7 @@ select#addElementType option { color:var(--text); font-weight:400; }
 <script>
 (function () {
   var ext = (window.parent && window.parent.__superGUIInstance) || (window.opener && window.opener.__superGUIInstance);
-  if (!ext) { document.body.innerHTML = '<div style="padding:40px;color:#e7e9f2;background:#1b1e29;height:100vh;font-family:sans-serif;">Open the editor from the "open SuperGUI editor" block.</div>'; return; }
+  if (!ext) { document.body.innerHTML = '<div style="padding:40px;color:#e7e9f2;background:#1b1e29;height:100vh;font-family:sans-serif;">SuperGUI editor could not connect to the extension.</div>'; return; }
   var config = JSON.parse(JSON.stringify(ext.config));
   var selectedPanel = config.panelOrder[0] || null;
   var selectedElement = null;
@@ -1224,6 +1224,8 @@ class SuperGUI {
       window.addEventListener('resize', () => this._syncOverlayPosition());
       document.addEventListener('mousemove', (e) => { this._lastMouseX = e.clientX; this._lastMouseY = e.clientY; });
       window.__superGUIInstance = this;
+      this._ensureEmbeddedEditor();
+      this._restoreEmbeddedEditor();
       this._startRAF();
     }
 
@@ -1235,8 +1237,6 @@ class SuperGUI {
       return {
         id: EXT_ID, name: 'SuperGUI', color1: '#5B6EE1', color2: '#4756B8', color3: '#38408C',
         blocks: [
-          { opcode: 'openEditor', blockType: B.COMMAND, text: 'open SuperGUI editor' },
-
           { blockType: B.LABEL, text: '─── Panel ───' },
           { opcode: 'showPanel', blockType: B.COMMAND, text: 'show panel [P]', arguments: { P: str('panels') } },
           { opcode: 'hidePanel', blockType: B.COMMAND, text: 'hide panel [P]', arguments: { P: str('panels') } },
