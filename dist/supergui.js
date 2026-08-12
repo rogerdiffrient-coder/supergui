@@ -1,4 +1,4 @@
-// SuperGUI v6.0 - generated file; edit src/ and run `npm run build`.
+// SuperGUI v6.0.1 - generated file; edit src/ and run `npm run build`.
 // Load this file as an unsandboxed custom extension in PenguinMod, TurboWarp, or Gandi IDE.
 (function (Scratch) {
   'use strict';
@@ -938,6 +938,50 @@ select#addElementType option { color:var(--text); font-weight:400; }
     }
   }
 
+  var V6_EDITOR_TYPES=['icon','avatar','card','panelheader','breadcrumb','pagination','notification','toast','alert','chip','tag','pill','meter','gauge','thermometer','sparkline','barchart','linechart','piechart','minimap','mapmarker','clock','timer','calendar','datepicker','filepicker','textarea','passwordinput','emailinput','urlinput','stepper','segmentedcontrol','toolbar','menubar','contextmenu','treeview','list','listitem','table','datagrid','statcard','keycap','hotkey','spacer','scrollarea','iframe','markdown','richtext','terminal','chatbubble'];
+  function v6PreviewBox(inner,s){inner.style.background=s.background;inner.style.color=s.color;inner.style.border=(s.borderWidth||1)+'px solid '+s.borderColor;inner.style.borderRadius=(s.borderRadius||6)+'px';inner.style.padding='4px';inner.style.fontSize='9px';}
+  function v6MiniBars(inner,s){inner.innerHTML='';inner.style.cssText+='display:flex;align-items:flex-end;justify-content:space-around;gap:3px;padding:5px;background:'+s.background+';border-radius:'+s.borderRadius+'px;';[45,78,35,92,60].forEach(function(v){var b=document.createElement('i');b.style.cssText='display:block;width:12%;height:'+v+'%;background:'+s.borderColor+';border-radius:2px 2px 0 0;';inner.appendChild(b);});}
+  function buildV6EditorPreview(inner,el,s){
+    var t=el.type, text=el.text||t, items=(el.items&&el.items.length?el.items:['Home','Edit','View']);
+    v6PreviewBox(inner,s);
+    if(t==='icon'){inner.textContent=el.icon||'★';inner.style.fontSize='22px';}
+    else if(t==='avatar'){inner.textContent=el.icon||'🙂';inner.style.borderRadius='50%';inner.style.fontSize='20px';}
+    else if(t==='card'||t==='statcard'){inner.innerHTML='<div style="font-weight:800">'+(t==='statcard'?'1,337':text)+'</div><div style="opacity:.65;font-size:7px">'+(t==='statcard'?'Total score':'Card content')+'</div>';inner.style.display='block';}
+    else if(t==='panelheader'){inner.textContent=text||'Window title';inner.style.justifyContent='flex-start';inner.style.fontWeight='800';}
+    else if(t==='breadcrumb'){inner.textContent='Home  ›  Games  ›  Level';inner.style.justifyContent='flex-start';}
+    else if(t==='pagination'){inner.textContent='‹  1  2  3  ›';}
+    else if(['notification','toast','alert'].indexOf(t)!==-1){inner.innerHTML='<b>'+({notification:'Notification',toast:'Saved!',alert:'Warning!'}[t])+'</b><span style="opacity:.7;margin-left:4px">'+text+'</span>';}
+    else if(['chip','tag','pill'].indexOf(t)!==-1){inner.textContent=text;inner.style.borderRadius=t==='pill'?'999px':'6px';inner.style.width='fit-content';inner.style.padding='3px 8px';}
+    else if(['meter','gauge','thermometer'].indexOf(t)!==-1){inner.innerHTML='<div style="width:80%;height:8px;background:#0005;border-radius:99px;overflow:hidden"><div style="width:65%;height:100%;background:'+s.borderColor+'"></div></div>';}
+    else if(t==='barchart'){v6MiniBars(inner,s);}
+    else if(t==='sparkline'||t==='linechart'){inner.innerHTML='<svg viewBox="0 0 100 40" width="100%" height="100%"><polyline fill="none" stroke="'+s.borderColor+'" stroke-width="4" points="0,32 18,22 35,29 53,10 70,18 100,4"/></svg>';}
+    else if(t==='piechart'){inner.innerHTML='<div style="width:32px;height:32px;border-radius:50%;background:conic-gradient('+s.borderColor+' 0 42%,#ffd166 42% 73%,#e15b6e 73%)"></div>';}
+    else if(t==='minimap'){inner.innerHTML='<div style="position:relative;width:100%;height:100%;background:linear-gradient(30deg,#243,#354);border-radius:4px"><b style="position:absolute;left:60%;top:35%;color:#ff5">●</b></div>';inner.style.padding='2px';}
+    else if(t==='mapmarker'){inner.textContent='📍';inner.style.fontSize='22px';inner.style.background='transparent';inner.style.border='none';}
+    else if(t==='clock'){inner.textContent='12:34';inner.style.fontWeight='800';inner.style.fontSize='14px';}
+    else if(t==='timer'){inner.textContent='00:42.8';inner.style.fontFamily='monospace';inner.style.fontWeight='800';}
+    else if(t==='calendar'||t==='datepicker'){inner.innerHTML='<b>AUG 2026</b><div style="font-size:7px;margin-top:3px">S M T W T F S<br>9 10 <u>11</u> 12 13 14 15</div>';inner.style.display='block';inner.style.textAlign='center';}
+    else if(t==='filepicker'){inner.textContent='Choose file…';inner.style.justifyContent='flex-start';}
+    else if(['textarea','passwordinput','emailinput','urlinput'].indexOf(t)!==-1){inner.textContent=t==='passwordinput'?'••••••••':(t==='emailinput'?'name@example.com':(t==='urlinput'?'https://example.com':'Write something…'));inner.style.justifyContent='flex-start';inner.style.opacity='.85';}
+    else if(t==='stepper'){inner.textContent='−   1   +';}
+    else if(t==='segmentedcontrol'){inner.innerHTML='<span style="background:'+s.borderColor+';padding:3px 6px;border-radius:4px">One</span><span style="padding:3px 6px">Two</span>';}
+    else if(t==='toolbar'||t==='menubar'){inner.textContent=items.join('   ');inner.style.justifyContent='flex-start';}
+    else if(t==='contextmenu'){inner.innerHTML='<div style="text-align:left">Open<br>Rename<br>Delete</div>';inner.style.justifyContent='flex-start';}
+    else if(t==='treeview'){inner.innerHTML='<div style="text-align:left">▾ Project<br>&nbsp;&nbsp;▸ Assets<br>&nbsp;&nbsp;▸ Scripts</div>';inner.style.justifyContent='flex-start';}
+    else if(t==='list'||t==='listitem'){inner.innerHTML=t==='list'?'<div style="text-align:left">• First item<br>• Second item<br>• Third item</div>':'• '+text;inner.style.justifyContent='flex-start';}
+    else if(t==='table'||t==='datagrid'){inner.innerHTML='<table style="width:100%;font-size:7px;border-collapse:collapse"><tr><th>Name</th><th>Score</th></tr><tr><td>Roger</td><td>100</td></tr><tr><td>Joe</td><td>73</td></tr></table>';}
+    else if(t==='keycap'){inner.textContent='⌘';inner.style.boxShadow='inset 0 -3px 0 #0005';inner.style.fontWeight='800';}
+    else if(t==='hotkey'){inner.textContent='⌘  +  K';inner.style.fontWeight='700';}
+    else if(t==='spacer'){inner.innerHTML='<div style="width:100%;border-top:1px dashed '+s.borderColor+'"></div>';inner.style.background='transparent';inner.style.border='none';}
+    else if(t==='scrollarea'){inner.innerHTML='<div style="width:100%;height:100%;overflow:hidden;text-align:left">Scrollable content<br>More content<br>More content<br>More content</div>';}
+    else if(t==='iframe'){inner.innerHTML='<div style="font-size:18px">🌐</div><small style="margin-left:5px">Web Embed</small>';}
+    else if(t==='markdown'){inner.innerHTML='<div style="text-align:left"><b style="font-size:12px">Heading</b><br><i>Markdown preview</i></div>';inner.style.justifyContent='flex-start';}
+    else if(t==='richtext'){inner.innerHTML='<div style="text-align:left"><b>Bold</b> <i>italic</i> <u>underline</u></div>';inner.style.justifyContent='flex-start';}
+    else if(t==='terminal'){inner.innerHTML='<div style="font-family:monospace;text-align:left;width:100%"><span style="color:#8f8">$</span> run game<br><span style="opacity:.65">Ready.</span></div>';inner.style.background='#090b10';inner.style.justifyContent='flex-start';}
+    else if(t==='chatbubble'){inner.textContent='Hey! This is a chat bubble.';inner.style.borderRadius='12px 12px 12px 3px';inner.style.justifyContent='flex-start';}
+    else inner.textContent=text;
+  }
+
   function buildInnerPreview(el) {
     var s=el.style;
     var inner=document.createElement('div'); inner.className='inner';
@@ -1001,6 +1045,7 @@ select#addElementType option { color:var(--text); font-weight:400; }
       var lh=document.createElement('b'); lh.textContent=el.title||'Leaderboard'; lh.style.cssText='padding:3px 5px;background:'+el.accent+';color:#fff;'; inner.appendChild(lh);
       (el.entries||[]).slice(0,Number(el.maxVisible)||5).forEach(function(entry,i){var row=document.createElement('div');row.style.cssText='display:grid;grid-template-columns:14px 1fr auto;padding:2px 4px;';var rank=document.createElement('b');rank.textContent=i+1;var player=document.createElement('span');player.textContent=entry.player||'player';var score=document.createElement('b');score.textContent=Number(entry.score)||0;row.appendChild(rank);row.appendChild(player);row.appendChild(score);inner.appendChild(row);});
     }
+    else if(V6_EDITOR_TYPES.indexOf(el.type)!==-1) buildV6EditorPreview(inner,el,s);
     else inner.textContent=el.type;
 
     if(el.type==='leaderboard' && el.leaderboardMode==='custom') {
@@ -1047,8 +1092,8 @@ select#addElementType option { color:var(--text); font-weight:400; }
           if (el.skin&&el.skin.url) { wrap.style.border=(Number(el.skin.width)||0)+'px solid transparent'; wrap.style.borderImageSource='url("'+el.skin.url+'")'; wrap.style.borderImageSlice=(Number(el.skin.slice)||0)+' fill'; wrap.style.borderImageWidth=String(Number(el.skin.width)||0); wrap.style.borderImageRepeat=el.skin.repeat||'stretch'; }
           wrap.appendChild(buildInnerPreview(el));
           if (!previewMode) {
-            wrap.addEventListener('mousedown', function(e){e.stopPropagation(); selectedPanel=key; selectedElement=id; renderAll(); startDrag(e, panel, el);});
-            var h=document.createElement('div'); h.className='handle'; h.addEventListener('mousedown', function(e){e.stopPropagation(); selectedPanel=key; selectedElement=id; renderAll(); startResize(e, panel, el);}); wrap.appendChild(h);
+            wrap.addEventListener('mousedown', function(e){e.stopPropagation(); selectedPanel=key; selectedElement=id; document.querySelectorAll('.ed-el.selected').forEach(function(n){n.classList.remove('selected');}); wrap.classList.add('selected'); renderElementList(); renderProps(); startDrag(e, panel, el);});
+            var h=document.createElement('div'); h.className='handle'; h.addEventListener('mousedown', function(e){e.stopPropagation(); selectedPanel=key; selectedElement=id; document.querySelectorAll('.ed-el.selected').forEach(function(n){n.classList.remove('selected');}); wrap.classList.add('selected'); renderElementList(); renderProps(); startResize(e, panel, el);}); wrap.appendChild(h);
             var rh=document.createElement('div'); rh.className='rothandle'; rh.addEventListener('mousedown', function(e){
     e.stopPropagation();
     selectedPanel=key;
@@ -3328,7 +3373,7 @@ SuperGUI.prototype.getInfo = function () {
   const num = value => ({ type:S.NUMBER, defaultValue:value });
 
   info.menus = info.menus || {};
-  info.menus.paletteModes = { acceptReporters:false, items:['compact','all'] };
+  info.menus.paletteModes = { acceptReporters:false, items:['core','panels','elements','appearance','layout','data','game services','v6','all'] };
   info.menus.artStates = { acceptReporters:false, items:['normal','hover','pressed'] };
   info.menus.artModes = { acceptReporters:false, items:['background','overlay','replace'] };
   info.menus.artFits = { acceptReporters:false, items:['cover','contain','stretch','tile'] };
@@ -3336,7 +3381,7 @@ SuperGUI.prototype.getInfo = function () {
 
   const v5xBlocks = [
     { blockType:B.LABEL, text:'─── SuperGUI palette ───' },
-    { opcode:'setBlockPaletteMode', blockType:B.COMMAND, text:'show [MODE] SuperGUI blocks', arguments:{ MODE:str('paletteModes','compact') } },
+    { opcode:'setBlockPaletteMode', blockType:B.COMMAND, text:'show SuperGUI category [MODE]', arguments:{ MODE:str('paletteModes','compact') } },
 
     { blockType:B.LABEL, text:'─── Custom art ───' },
     { opcode:'setElementArtImage', blockType:B.COMMAND, text:'set [E] [STATE] art image [URL]', arguments:{ E:str('elements'), STATE:str('artStates','normal'), URL:{ type:S.STRING, defaultValue:'' } } },
@@ -3358,17 +3403,28 @@ SuperGUI.prototype.getInfo = function () {
 
   info.blocks = v5xBlocks.concat(info.blocks || []).filter(block => block.opcode !== 'openEditor');
 
-  if (this._compactPalette === undefined) this._compactPalette = true;
-  if (this._compactPalette) {
-    let keepNextLabel = false;
+  if (this._paletteCategory === undefined) this._paletteCategory = 'core';
+  const category = String(this._paletteCategory || 'core').toLowerCase();
+  if (category !== 'all') {
+    const categoryTests = {
+      core: /palette|events|save \/ load/i,
+      panels: /panels/i,
+      elements: /element create|element transform|element value|elements/i,
+      appearance: /appearance|custom art|theme/i,
+      layout: /layout|container|animation|drag/i,
+      data: /leaderboard|achievement|data/i,
+      'game services': /game services|storage|cloud/i,
+      v6: /v6:/i
+    };
+    const test = categoryTests[category] || categoryTests.core;
+    let active = false;
     info.blocks = info.blocks.filter(block => {
-      if (block.opcode) return V5X_CORE_OPCODES.has(block.opcode);
       if (block.blockType === B.LABEL) {
-        const text = String(block.text || '');
-        keepNextLabel = /palette|custom art|custom leaderboard/i.test(text);
-        return keepNextLabel;
+        active = test.test(String(block.text || '')) || /SuperGUI palette/i.test(String(block.text || ''));
+        return active;
       }
-      return false;
+      if (block.opcode === 'setBlockPaletteMode') return true;
+      return active;
     });
   }
   return info;
@@ -3385,7 +3441,7 @@ SuperGUI.prototype._refreshV5xBlocks = function () {
 };
 
 SuperGUI.prototype.setBlockPaletteMode = function (a) {
-  this._compactPalette = String(a.MODE || 'compact').toLowerCase() !== 'all';
+  this._paletteCategory = String(a.MODE || 'core').toLowerCase();
   this._refreshV5xBlocks();
 };
 
@@ -3740,6 +3796,7 @@ SuperGUI.prototype.getInfo = function () {
   info.menus.v6Templates = {acceptReporters:false, items:V6_TEMPLATE_NAMES};
   info.menus.panelImageFits = {acceptReporters:false, items:['cover','contain','stretch','tile']};
   info.menus.panelBorderStyles = {acceptReporters:false, items:['solid','dashed','dotted','double','none']};
+  info.menus.v6BubbleSides = {acceptReporters:false, items:['left','right']};
   const blocks = [
     {blockType:B.LABEL,text:'─── v6: Drag Zones ───'},
     {opcode:'addPanelDragZone',blockType:B.COMMAND,text:'make [E] a drag zone for panel [P]',arguments:{E:str('elements'),P:str('panels')}},
@@ -3773,7 +3830,46 @@ SuperGUI.prototype.getInfo = function () {
     {opcode:'getV6ItemData',blockType:B.REPORTER,text:'[E] data JSON',arguments:{E:str('elements')}},
     {opcode:'setV6ItemText',blockType:B.COMMAND,text:'set [E] v6 text [TEXT]',arguments:{E:str('elements'),TEXT:str(null,'Text')}},
     {opcode:'setV6ItemIcon',blockType:B.COMMAND,text:'set [E] v6 icon/image [VALUE]',arguments:{E:str('elements'),VALUE:str(null,'★')}},
-    {opcode:'setV6ItemItems',blockType:B.COMMAND,text:'set [E] v6 items JSON [JSON]',arguments:{E:str('elements'),JSON:str(null,'[]')}}
+    {opcode:'setV6ItemItems',blockType:B.COMMAND,text:'set [E] v6 items JSON [JSON]',arguments:{E:str('elements'),JSON:str(null,'[]')}},
+    {opcode:'getV6ItemItems',blockType:B.REPORTER,text:'[E] v6 items JSON',arguments:{E:str('elements')}},
+    {opcode:'addV6Item',blockType:B.COMMAND,text:'add item [ITEM] to [E]',arguments:{ITEM:str(null,'Item'),E:str('elements')}},
+    {opcode:'removeV6ItemAt',blockType:B.COMMAND,text:'remove item [INDEX] from [E]',arguments:{INDEX:num(1),E:str('elements')}},
+    {opcode:'clearV6Items',blockType:B.COMMAND,text:'clear items in [E]',arguments:{E:str('elements')}},
+    {opcode:'getV6ItemAt',blockType:B.REPORTER,text:'item [INDEX] of [E]',arguments:{INDEX:num(1),E:str('elements')}},
+    {opcode:'getV6ItemCount',blockType:B.REPORTER,text:'item count of [E]',arguments:{E:str('elements')}},
+
+    {blockType:B.LABEL,text:'─── v6: Values / selection ───'},
+    {opcode:'setV6Value',blockType:B.COMMAND,text:'set [E] v6 value [VALUE]',arguments:{E:str('elements'),VALUE:str(null,'50')}},
+    {opcode:'getV6Value',blockType:B.REPORTER,text:'[E] v6 value',arguments:{E:str('elements')}},
+    {opcode:'setV6Range',blockType:B.COMMAND,text:'set [E] range min [MIN] max [MAX]',arguments:{E:str('elements'),MIN:num(0),MAX:num(100)}},
+    {opcode:'setV6SelectedIndex',blockType:B.COMMAND,text:'set [E] selected index [INDEX]',arguments:{E:str('elements'),INDEX:num(1)}},
+    {opcode:'getV6SelectedIndex',blockType:B.REPORTER,text:'selected index of [E]',arguments:{E:str('elements')}},
+    {opcode:'getV6SelectedItem',blockType:B.REPORTER,text:'selected item of [E]',arguments:{E:str('elements')}},
+    {opcode:'setV6Progress',blockType:B.COMMAND,text:'set [E] progress [VALUE]%',arguments:{E:str('elements'),VALUE:num(50)}},
+
+    {blockType:B.LABEL,text:'─── v6: Content / inputs ───'},
+    {opcode:'setV6Placeholder',blockType:B.COMMAND,text:'set [E] placeholder [TEXT]',arguments:{E:str('elements'),TEXT:str(null,'Type here...')}},
+    {opcode:'setV6URL',blockType:B.COMMAND,text:'set [E] URL [URL]',arguments:{E:str('elements'),URL:str(null,'https://example.com')}},
+    {opcode:'getV6URL',blockType:B.REPORTER,text:'URL of [E]',arguments:{E:str('elements')}},
+    {opcode:'setV6Image',blockType:B.COMMAND,text:'set [E] image [URL]',arguments:{E:str('elements'),URL:str(null,'')}},
+    {opcode:'appendV6Text',blockType:B.COMMAND,text:'append [TEXT] to [E]',arguments:{TEXT:str(null,'Hello'),E:str('elements')}},
+    {opcode:'clearV6Content',blockType:B.COMMAND,text:'clear content of [E]',arguments:{E:str('elements')}},
+    {opcode:'setV6Rows',blockType:B.COMMAND,text:'set [E] rows JSON [JSON]',arguments:{E:str('elements'),JSON:str(null,'[]')}},
+    {opcode:'getV6Rows',blockType:B.REPORTER,text:'rows JSON of [E]',arguments:{E:str('elements')}},
+    {opcode:'setV6Columns',blockType:B.COMMAND,text:'set [E] columns JSON [JSON]',arguments:{E:str('elements'),JSON:str(null,'[]')}},
+    {opcode:'setV6ChartValues',blockType:B.COMMAND,text:'set [E] chart values [JSON]',arguments:{E:str('elements'),JSON:str(null,'[10,20,30]')}},
+
+    {blockType:B.LABEL,text:'─── v6: Terminal / chat / time ───'},
+    {opcode:'appendTerminalLineV6',blockType:B.COMMAND,text:'append terminal line [TEXT] to [E]',arguments:{TEXT:str(null,'Ready.'),E:str('elements')}},
+    {opcode:'clearTerminalV6',blockType:B.COMMAND,text:'clear terminal [E]',arguments:{E:str('elements')}},
+    {opcode:'setChatBubbleSideV6',blockType:B.COMMAND,text:'set chat bubble [E] side [SIDE]',arguments:{E:str('elements'),SIDE:str('v6BubbleSides','left')}},
+    {opcode:'setV6Date',blockType:B.COMMAND,text:'set [E] date [DATE]',arguments:{E:str('elements'),DATE:str(null,'2026-08-12')}},
+    {opcode:'setV6TimerSeconds',blockType:B.COMMAND,text:'set [E] timer seconds [SECONDS]',arguments:{E:str('elements'),SECONDS:num(60)}},
+    {opcode:'getV6TimerSeconds',blockType:B.REPORTER,text:'timer seconds of [E]',arguments:{E:str('elements')}},
+
+    {blockType:B.LABEL,text:'─── v6: Generic property ───'},
+    {opcode:'setV6Property',blockType:B.COMMAND,text:'set [E] property [KEY] to [VALUE]',arguments:{E:str('elements'),KEY:str(null,'title'),VALUE:str(null,'Hello')}},
+    {opcode:'getV6Property',blockType:B.REPORTER,text:'property [KEY] of [E]',arguments:{KEY:str(null,'title'),E:str('elements')}}
   ];
   info.blocks = blocks.concat(info.blocks || []);
   return info;
@@ -3883,6 +3979,41 @@ SuperGUI.prototype._createElementDom=function(panelKey,elId,el){
   }
   return wrap;
 };
+
+
+// v6.0.1 direct item controls
+function v6Find(ext,a){return ext._findElement(a.E);}
+SuperGUI.prototype.getV6ItemItems=function(a){const f=v6Find(this,a);return f?JSON.stringify(f.el.items||[]):'[]';};
+SuperGUI.prototype.addV6Item=function(a){const f=v6Find(this,a);if(!f)return;f.el.items=Array.isArray(f.el.items)?f.el.items:[];f.el.items.push(String(a.ITEM??''));this._renderPanel(f.panelKey);};
+SuperGUI.prototype.removeV6ItemAt=function(a){const f=v6Find(this,a);if(!f)return;f.el.items=Array.isArray(f.el.items)?f.el.items:[];f.el.items.splice(Math.max(0,Number(a.INDEX||1)-1),1);this._renderPanel(f.panelKey);};
+SuperGUI.prototype.clearV6Items=function(a){const f=v6Find(this,a);if(!f)return;f.el.items=[];this._renderPanel(f.panelKey);};
+SuperGUI.prototype.getV6ItemAt=function(a){const f=v6Find(this,a);return f&&Array.isArray(f.el.items)?(f.el.items[Math.max(0,Number(a.INDEX||1)-1)]??''):'';};
+SuperGUI.prototype.getV6ItemCount=function(a){const f=v6Find(this,a);return f&&Array.isArray(f.el.items)?f.el.items.length:0;};
+SuperGUI.prototype.setV6Value=function(a){const f=v6Find(this,a);if(!f)return;const n=Number(a.VALUE);f.el.value=Number.isFinite(n)&&String(a.VALUE).trim()!==''?n:String(a.VALUE??'');this._renderPanel(f.panelKey);};
+SuperGUI.prototype.getV6Value=function(a){const f=v6Find(this,a);return f&&f.el.value!==undefined?f.el.value:'';};
+SuperGUI.prototype.setV6Range=function(a){const f=v6Find(this,a);if(!f)return;f.el.min=Number(a.MIN)||0;f.el.max=Number(a.MAX)||0;this._renderPanel(f.panelKey);};
+SuperGUI.prototype.setV6SelectedIndex=function(a){const f=v6Find(this,a);if(!f)return;f.el.selectedIndex=Math.max(0,Number(a.INDEX||1)-1);this._renderPanel(f.panelKey);};
+SuperGUI.prototype.getV6SelectedIndex=function(a){const f=v6Find(this,a);return f?(Number(f.el.selectedIndex||0)+1):0;};
+SuperGUI.prototype.getV6SelectedItem=function(a){const f=v6Find(this,a);if(!f)return '';const items=Array.isArray(f.el.items)?f.el.items:[];return items[Number(f.el.selectedIndex||0)]??'';};
+SuperGUI.prototype.setV6Progress=function(a){const f=v6Find(this,a);if(!f)return;f.el.progress=Math.max(0,Math.min(100,Number(a.VALUE)||0));f.el.value=f.el.progress;this._renderPanel(f.panelKey);};
+SuperGUI.prototype.setV6Placeholder=function(a){const f=v6Find(this,a);if(!f)return;f.el.placeholder=String(a.TEXT??'');this._renderPanel(f.panelKey);};
+SuperGUI.prototype.setV6URL=function(a){const f=v6Find(this,a);if(!f)return;f.el.url=String(a.URL??'');f.el.src=f.el.url;this._renderPanel(f.panelKey);};
+SuperGUI.prototype.getV6URL=function(a){const f=v6Find(this,a);return f?String(f.el.url||f.el.src||''):'';};
+SuperGUI.prototype.setV6Image=function(a){const f=v6Find(this,a);if(!f)return;f.el.image=String(a.URL??'');f.el.icon=f.el.image;this._renderPanel(f.panelKey);};
+SuperGUI.prototype.appendV6Text=function(a){const f=v6Find(this,a);if(!f)return;f.el.text=String(f.el.text||'')+String(a.TEXT??'');this._renderPanel(f.panelKey);};
+SuperGUI.prototype.clearV6Content=function(a){const f=v6Find(this,a);if(!f)return;f.el.text='';f.el.value='';f.el.items=[];f.el.rows=[];this._renderPanel(f.panelKey);};
+SuperGUI.prototype.setV6Rows=function(a){const f=v6Find(this,a);if(!f)return;try{const v=JSON.parse(String(a.JSON||'[]'));if(Array.isArray(v)){f.el.rows=v;f.el.items=v;this._renderPanel(f.panelKey);}}catch(e){}};
+SuperGUI.prototype.getV6Rows=function(a){const f=v6Find(this,a);return f?JSON.stringify(f.el.rows||f.el.items||[]):'[]';};
+SuperGUI.prototype.setV6Columns=function(a){const f=v6Find(this,a);if(!f)return;try{const v=JSON.parse(String(a.JSON||'[]'));if(Array.isArray(v)){f.el.columns=v;this._renderPanel(f.panelKey);}}catch(e){}};
+SuperGUI.prototype.setV6ChartValues=function(a){const f=v6Find(this,a);if(!f)return;try{const v=JSON.parse(String(a.JSON||'[]'));if(Array.isArray(v)){f.el.values=v;f.el.items=v;this._renderPanel(f.panelKey);}}catch(e){}};
+SuperGUI.prototype.appendTerminalLineV6=function(a){const f=v6Find(this,a);if(!f)return;f.el.lines=Array.isArray(f.el.lines)?f.el.lines:[];f.el.lines.push(String(a.TEXT??''));f.el.text=f.el.lines.join('\n');this._renderPanel(f.panelKey);};
+SuperGUI.prototype.clearTerminalV6=function(a){const f=v6Find(this,a);if(!f)return;f.el.lines=[];f.el.text='';this._renderPanel(f.panelKey);};
+SuperGUI.prototype.setChatBubbleSideV6=function(a){const f=v6Find(this,a);if(!f)return;f.el.side=String(a.SIDE)==='right'?'right':'left';this._renderPanel(f.panelKey);};
+SuperGUI.prototype.setV6Date=function(a){const f=v6Find(this,a);if(!f)return;f.el.date=String(a.DATE??'');f.el.value=f.el.date;this._renderPanel(f.panelKey);};
+SuperGUI.prototype.setV6TimerSeconds=function(a){const f=v6Find(this,a);if(!f)return;f.el.seconds=Math.max(0,Number(a.SECONDS)||0);f.el.value=f.el.seconds;this._renderPanel(f.panelKey);};
+SuperGUI.prototype.getV6TimerSeconds=function(a){const f=v6Find(this,a);return f?Number(f.el.seconds??f.el.value??0):0;};
+SuperGUI.prototype.setV6Property=function(a){const f=v6Find(this,a);if(!f)return;const key=String(a.KEY||'').trim();if(!key||['__proto__','prototype','constructor'].includes(key))return;let v=a.VALUE;try{v=JSON.parse(String(a.VALUE));}catch(e){}f.el[key]=v;this._renderPanel(f.panelKey);};
+SuperGUI.prototype.getV6Property=function(a){const f=v6Find(this,a);if(!f)return '';const key=String(a.KEY||'').trim(),v=f.el[key];return typeof v==='object'?JSON.stringify(v):(v??'');};
 
 
 // SuperGUI v6 hardening and regression fixes.
