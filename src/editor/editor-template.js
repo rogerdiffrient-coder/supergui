@@ -539,7 +539,12 @@ select#addElementType option { color:var(--text); font-weight:400; }
           if (!previewMode) {
             wrap.addEventListener('mousedown', function(e){e.stopPropagation(); selectedPanel=key; selectedElement=id; renderAll(); startDrag(e, panel, el);});
             var h=document.createElement('div'); h.className='handle'; h.addEventListener('mousedown', function(e){e.stopPropagation(); selectedPanel=key; selectedElement=id; renderAll(); startResize(e, panel, el);}); wrap.appendChild(h);
-            var rh=document.createElement('div'); rh.className='rothandle'; rh.addEventListener('mousedown', function(e){e.stopPropagation(); selectedPanel=key; selectedElement=id; renderAll(); startRotate(e, panel, el, wrap);}); wrap.appendChild(rh);
+            var rh=document.createElement('div'); rh.className='rothandle'; rh.addEventListener('mousedown', function(e){
+    e.stopPropagation();
+    selectedPanel=key;
+    selectedElement=id;
+    startRotate(e, panel, el, wrap);
+  }); wrap.appendChild(rh);
           }
           div.appendChild(wrap);
         });
@@ -550,7 +555,23 @@ select#addElementType option { color:var(--text); font-weight:400; }
   function stagePx() { var s=document.getElementById('stage'); return {w:s.clientWidth, h:s.clientHeight}; }
   function startDrag(e, p, el) { var sx=e.clientX, sy=e.clientY, ox=el.x, oy=el.y, sz=stagePx(), pw=sz.w*p.width/100, ph=sz.h*p.height/100; function m(ev){ var dx=(ev.clientX-sx)/pw*100, dy=(ev.clientY-sy)/ph*100; el.x=Math.max(0,Math.min(100-el.width,ox+dx)); el.y=Math.max(0,Math.min(100-el.height,oy+dy)); renderStage(); } function u(){ document.removeEventListener('mousemove',m); document.removeEventListener('mouseup',u); renderProps(); } document.addEventListener('mousemove',m); document.addEventListener('mouseup',u); }
   function startResize(e, p, el) { var sx=e.clientX, sy=e.clientY, ow=el.width, oh=el.height, sz=stagePx(), pw=sz.w*p.width/100, ph=sz.h*p.height/100; function m(ev){ var dw=(ev.clientX-sx)/pw*100, dh=(ev.clientY-sy)/ph*100; el.width=Math.max(4,Math.min(100-el.x,ow+dw)); el.height=Math.max(4,Math.min(100-el.y,oh+dh)); renderStage(); } function u(){ document.removeEventListener('mousemove',m); document.removeEventListener('mouseup',u); renderProps(); } document.addEventListener('mousemove',m); document.addEventListener('mouseup',u); }
-  function startRotate(e, p, el, wrapNode) { var r=wrapNode.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2; function a(ev){ return Math.atan2(ev.clientY-cy, ev.clientX-cx)*180/Math.PI+90; } function m(ev){ el.rotation=Math.round(a(ev)); renderStage(); } function u(){ document.removeEventListener('mousemove',m); document.removeEventListener('mouseup',u); renderProps(); } document.addEventListener('mousemove',m); document.addEventListener('mouseup',u); }
+  function startRotate(e, p, el, wrapNode) {
+  e.preventDefault();
+  var r=wrapNode.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2;
+  function angle(ev){ return Math.atan2(ev.clientY-cy, ev.clientX-cx)*180/Math.PI+90; }
+  function m(ev){
+    el.rotation=Math.round(angle(ev));
+    wrapNode.style.transform='rotate('+el.rotation+'deg)';
+  }
+  function u(){
+    document.removeEventListener('mousemove',m);
+    document.removeEventListener('mouseup',u);
+    renderAll();
+  }
+  m(e);
+  document.addEventListener('mousemove',m);
+  document.addEventListener('mouseup',u);
+}
 
   function renderProps() {
     var props=document.getElementById('props'); props.innerHTML='';
