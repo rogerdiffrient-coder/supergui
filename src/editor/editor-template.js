@@ -64,7 +64,7 @@ select#addElementType option { color:var(--text); font-weight:400; }
   <button id="btnExport">Export</button>
   <button id="btnSave" class="primary">Save</button>
   <button id="btnMin" class="chrome" title="Minimize">_</button>
-  <button id="btnClose" class="chrome danger" title="Close">×</button>
+  <button id="btnClose" class="chrome danger" title="Close" style="display:none">×</button>
   <input type="file" id="fileImport" accept="application/json">
 </header>
 <div class="layout">
@@ -116,7 +116,7 @@ select#addElementType option { color:var(--text); font-weight:400; }
 <div class="toast" id="toast"></div>
 <script>
 (function () {
-  var ext = window.opener && window.opener.__superGUIInstance;
+  var ext = (window.parent && window.parent.__superGUIInstance) || (window.opener && window.opener.__superGUIInstance);
   if (!ext) { document.body.innerHTML = '<div style="padding:40px;color:#e7e9f2;background:#1b1e29;height:100vh;font-family:sans-serif;">Open the editor from the "open SuperGUI editor" block.</div>'; return; }
   var config = JSON.parse(JSON.stringify(ext.config));
   var selectedPanel = config.panelOrder[0] || null;
