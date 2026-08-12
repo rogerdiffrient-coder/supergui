@@ -1,5 +1,5 @@
 // SuperGUI fullscreen scaling controls.
-// Default: keep GUI at its 480x360 design size when the rendered stage grows.
+// Default: preserve the GUI's pre-fullscreen physical size instead of enlarging it.
 
 const _sgFullscreenOriginalGetInfo = SuperGUI.prototype.getInfo;
 SuperGUI.prototype.getInfo = function () {
@@ -24,4 +24,53 @@ SuperGUI.prototype.setFullscreenGUIScaling = function (a) {
 
 SuperGUI.prototype.isFullscreenGUIScalingEnabled = function () {
   return !!this._scaleGUIInFullscreen;
+};
+
+// Override the stability layer's sync with two fullscreen behaviors:
+// OFF (default): remember the pre-fullscreen stage size and keep the GUI that size.
+// ON: let the GUI expand and reflow with the rendered fullscreen stage.
+SuperGUI.prototype._syncOverlayPosition = function () {
+  this._ensureOverlayHost && this._ensureOverlayHost();
+  const canvas = this.runtime && this.runtime.renderer && this.runtime.renderer.canvas;
+  const overlay = this.overlay;
+  if (!canvas || !overlay) return;
+
+  const host = this._overlayHost || overlay.parentElement || document.body;
+  const canvasRect = canvas.getBoundingClientRect();
+  const hostRect = host.getBoundingClientRect();
+  if (!canvasRect.width || !canvasRect.height) return;
+
+  const explicitFullscreen = !!document.fullscreenElement;
+  const remembered = this._preFullscreenStageSize;
+  const sizeJumpFullscreen = !!remembered &&
+    (canvasRect.width > remembered.width * 1.3 || canvasRect.height > remembered.height * 1.3);
+  const fullscreenLike = explicitFullscreen || sizeJumpFullscreen;
+
+  // Learn/update the ordinary embedded stage size only while we are not fullscreen.
+  if (!fullscreenLike) {
+    this._preFullscreenStageSize = {width:canvasRect.width, height:canvasRect.height};
+  }
+
+  const base = this._preFullscreenStageSize || {width:canvasRect.width, height:canvasRect.height};
+  const scaleInFullscreen = !!this._scaleGUIInFullscreen;
+  const freeze = fullscreenLike && !scaleInFullscreen;
+  const width = freeze ? Math.min(base.width, canvasRect.width) : canvasRect.width;
+  const height = freeze ? Math.min(base.height, canvasRect.height) : canvasRect.height;
+  const insetX = freeze ? (canvasRect.width - width) / 2 : 0;
+  const insetY = freeze ? (canvasRect.height - height) / 2 : 0;
+
+  overlay.style.left = (canvasRect.left - hostRect.left + host.scrollLeft + insetX) + 'px';
+  overlay.style.top = (canvasRect.top - hostRect.top + host.scrollTop + insetY) + 'px';
+  overlay.style.width = width + 'px';
+  overlay.style.height = height + 'px';
+
+  const sx = width / 480;
+  const sy = height / 360;
+  const nextScale = Math.max(0.1, Math.min(sx, sy));
+  this._uiScale = nextScale;
+
+  if (Math.abs(nextScale - (this._lastUIScale || 1)) > 0.01) {
+    this._lastUIScale = nextScale;
+    if (this.panelDoms && Object.keys(this.panelDoms).length) this._renderAll();
+  }
 };
