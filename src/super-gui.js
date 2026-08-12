@@ -1501,6 +1501,13 @@ export class SuperGUI {
           n.width = 300; n.height = 200;
           break;
         }
+        case 'container': {
+          const n = document.createElement('div');
+          n.style.cssText = 'width:100%;height:100%;box-sizing:border-box;position:relative;overflow:' + (el.layoutOverflow || 'auto') + ';background:' + s.background + ';border:' + s.borderWidth + 'px solid ' + s.borderColor + ';border-radius:' + s.borderRadius + 'px;';
+          n.dataset.superguiContainer = elId;
+          wrap.appendChild(n);
+          break;
+        }
         case 'tooltip': {
           const n = document.createElement('div');
           n.style.cssText = 'position:absolute;background:' + el.background + ';color:' + el.textColor + ';padding:4px 8px;border-radius:4px;font-size:11px;pointer-events:none;display:' + (el.visible === false ? 'none' : 'block') + ';z-index:9999;';
