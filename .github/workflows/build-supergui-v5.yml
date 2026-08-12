@@ -25,6 +25,7 @@ jobs:
         run: |
           python3 scripts/apply-v5-upgrade.py
           python3 scripts/fix-v5-editor-options.py
+          python3 scripts/fix-v5-renderer.py
 
       - name: Build bundle
         run: npm run build
@@ -38,7 +39,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/constants-and-model.js src/editor/editor-template.js src/v5-layout.js scripts/build.mjs package.json dist/supergui.js
+          git add src/constants-and-model.js src/editor/editor-template.js src/super-gui.js src/v5-layout.js scripts/build.mjs package.json dist/supergui.js
           git commit -m "feat: build SuperGUI v5 layout editor [v5-build-bot]"
           git pull --rebase origin feature/supergui-v5-layout-editor
           git push origin feature/supergui-v5-layout-editor
