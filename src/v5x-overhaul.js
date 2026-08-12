@@ -25,7 +25,7 @@ SuperGUI.prototype.getInfo = function () {
   const num = value => ({ type:S.NUMBER, defaultValue:value });
 
   info.menus = info.menus || {};
-  info.menus.paletteModes = { acceptReporters:false, items:['compact','all'] };
+  info.menus.paletteModes = { acceptReporters:false, items:['core','panels','elements','appearance','layout','data','game services','v6','all'] };
   info.menus.artStates = { acceptReporters:false, items:['normal','hover','pressed'] };
   info.menus.artModes = { acceptReporters:false, items:['background','overlay','replace'] };
   info.menus.artFits = { acceptReporters:false, items:['cover','contain','stretch','tile'] };
@@ -33,7 +33,7 @@ SuperGUI.prototype.getInfo = function () {
 
   const v5xBlocks = [
     { blockType:B.LABEL, text:'─── SuperGUI palette ───' },
-    { opcode:'setBlockPaletteMode', blockType:B.COMMAND, text:'show [MODE] SuperGUI blocks', arguments:{ MODE:str('paletteModes','compact') } },
+    { opcode:'setBlockPaletteMode', blockType:B.COMMAND, text:'show SuperGUI category [MODE]', arguments:{ MODE:str('paletteModes','compact') } },
 
     { blockType:B.LABEL, text:'─── Custom art ───' },
     { opcode:'setElementArtImage', blockType:B.COMMAND, text:'set [E] [STATE] art image [URL]', arguments:{ E:str('elements'), STATE:str('artStates','normal'), URL:{ type:S.STRING, defaultValue:'' } } },
@@ -55,17 +55,28 @@ SuperGUI.prototype.getInfo = function () {
 
   info.blocks = v5xBlocks.concat(info.blocks || []).filter(block => block.opcode !== 'openEditor');
 
-  if (this._compactPalette === undefined) this._compactPalette = true;
-  if (this._compactPalette) {
-    let keepNextLabel = false;
+  if (this._paletteCategory === undefined) this._paletteCategory = 'core';
+  const category = String(this._paletteCategory || 'core').toLowerCase();
+  if (category !== 'all') {
+    const categoryTests = {
+      core: /palette|events|save \/ load/i,
+      panels: /panels/i,
+      elements: /element create|element transform|element value|elements/i,
+      appearance: /appearance|custom art|theme/i,
+      layout: /layout|container|animation|drag/i,
+      data: /leaderboard|achievement|data/i,
+      'game services': /game services|storage|cloud/i,
+      v6: /v6:/i
+    };
+    const test = categoryTests[category] || categoryTests.core;
+    let active = false;
     info.blocks = info.blocks.filter(block => {
-      if (block.opcode) return V5X_CORE_OPCODES.has(block.opcode);
       if (block.blockType === B.LABEL) {
-        const text = String(block.text || '');
-        keepNextLabel = /palette|custom art|custom leaderboard/i.test(text);
-        return keepNextLabel;
+        active = test.test(String(block.text || '')) || /SuperGUI palette/i.test(String(block.text || ''));
+        return active;
       }
-      return false;
+      if (block.opcode === 'setBlockPaletteMode') return true;
+      return active;
     });
   }
   return info;
@@ -82,7 +93,7 @@ SuperGUI.prototype._refreshV5xBlocks = function () {
 };
 
 SuperGUI.prototype.setBlockPaletteMode = function (a) {
-  this._compactPalette = String(a.MODE || 'compact').toLowerCase() !== 'all';
+  this._paletteCategory = String(a.MODE || 'core').toLowerCase();
   this._refreshV5xBlocks();
 };
 
