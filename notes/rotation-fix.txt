@@ -1,1 +1,0 @@
-Rotation fix branch: editor rotation now measures the live element and updates its transform directly during dragging; full rerender happens on mouseup.
