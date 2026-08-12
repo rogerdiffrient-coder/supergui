@@ -63,11 +63,13 @@ jobs:
           p.write_text(s)
           PY
 
-      - name: Test and build
+      - name: Build
+        run: npm run build
+
+      - name: Test and check
         run: |
           npm test
           npm run check
-          npm run build
 
       - name: Commit generated fix
         run: |
