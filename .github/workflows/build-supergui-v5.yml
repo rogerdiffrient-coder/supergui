@@ -22,7 +22,9 @@ jobs:
           node-version: 20
 
       - name: Apply v5 source upgrade
-        run: python3 scripts/apply-v5-upgrade.py
+        run: |
+          python3 scripts/apply-v5-upgrade.py
+          python3 scripts/fix-v5-editor-options.py
 
       - name: Build bundle
         run: npm run build
