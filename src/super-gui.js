@@ -16,6 +16,9 @@ export class SuperGUI {
       this._draggingElements = new Set();
       this._justDragged = new Set();
       this._editorWindow = null;
+      this._editorDock = null;
+      this._editorFrame = null;
+      this._editorLauncher = null;
       this._tweens = [];
       this._tweenPaused = false;
       this._tweenPanelSet = new Set();
@@ -867,13 +870,91 @@ export class SuperGUI {
     _normalizeConfig(config) { return normalizeConfig(config); }
 
     openEditor() {
-      if (this._editorWindow && !this._editorWindow.closed) { this._editorWindow.focus(); return; }
-      const win = window.open('', 'SuperGUIEditor', 'width=1360,height=880,resizable=yes');
-      if (!win) { alert('SuperGUI: popup blocked.'); return; }
-      win.document.open();
-      win.document.write(SUPERGUI_EDITOR_HTML);
-      win.document.close();
-      this._editorWindow = win;
+      this._ensureEmbeddedEditor();
+      this._restoreEmbeddedEditor();
+    }
+
+    _ensureEmbeddedEditor() {
+      if (this._editorDock && this._editorDock.isConnected) return;
+
+      const dock = document.createElement('div');
+      dock.id = 'supergui-editor-dock';
+      dock.style.cssText = [
+        'position:fixed',
+        'left:12px',
+        'right:12px',
+        'top:12px',
+        'bottom:12px',
+        'z-index:2147483000',
+        'background:#1b1e29',
+        'border:1px solid #3a3f52',
+        'border-radius:12px',
+        'box-shadow:0 18px 60px rgba(0,0,0,.55)',
+        'overflow:hidden',
+        'display:none'
+      ].join(';');
+
+      const frame = document.createElement('iframe');
+      frame.title = 'SuperGUI Editor';
+      frame.style.cssText = 'width:100%;height:100%;border:0;display:block;background:#1b1e29;';
+      dock.appendChild(frame);
+      document.body.appendChild(dock);
+
+      const launcher = document.createElement('button');
+      launcher.id = 'supergui-editor-launcher';
+      launcher.textContent = 'SuperGUI';
+      launcher.title = 'Restore SuperGUI Editor';
+      launcher.style.cssText = [
+        'position:fixed',
+        'right:16px',
+        'bottom:16px',
+        'z-index:2147483001',
+        'display:none',
+        'padding:8px 12px',
+        'border-radius:999px',
+        'border:1px solid #7180ff',
+        'background:#5B6EE1',
+        'color:#fff',
+        'font:600 12px sans-serif',
+        'cursor:pointer',
+        'box-shadow:0 8px 24px rgba(0,0,0,.35)'
+      ].join(';');
+      launcher.addEventListener('click', () => this._restoreEmbeddedEditor());
+      document.body.appendChild(launcher);
+
+      this._editorDock = dock;
+      this._editorFrame = frame;
+      this._editorLauncher = launcher;
+
+      const doc = frame.contentDocument;
+      doc.open();
+      doc.write(SUPERGUI_EDITOR_HTML);
+      doc.close();
+      this._wireEmbeddedEditorChrome();
+    }
+
+    _wireEmbeddedEditorChrome() {
+      const frame = this._editorFrame;
+      if (!frame) return;
+      const doc = frame.contentDocument;
+      if (!doc) return;
+      const min = doc.getElementById('btnMin');
+      const close = doc.getElementById('btnClose');
+      if (close) close.style.display = 'none';
+      if (min) {
+        min.title = 'Minimize editor';
+        min.onclick = (e) => { e.preventDefault(); this._minimizeEmbeddedEditor(); };
+      }
+    }
+
+    _minimizeEmbeddedEditor() {
+      if (this._editorDock) this._editorDock.style.display = 'none';
+      if (this._editorLauncher) this._editorLauncher.style.display = 'block';
+    }
+
+    _restoreEmbeddedEditor() {
+      if (this._editorDock) this._editorDock.style.display = 'block';
+      if (this._editorLauncher) this._editorLauncher.style.display = 'none';
     }
 
     // =================== OVERLAY / RENDERING ===================
