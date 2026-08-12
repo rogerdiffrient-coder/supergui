@@ -1,4 +1,4 @@
-// SuperGUI v6.0.2 - generated file; edit src/ and run `npm run build`.
+// SuperGUI v6.0.3 - generated file; edit src/ and run `npm run build`.
 // Load this file as an unsandboxed custom extension in PenguinMod, TurboWarp, or Gandi IDE.
 (function (Scratch) {
   'use strict';
@@ -3640,7 +3640,8 @@ SuperGUI.prototype.setLeaderboardRowHeight = function (a) {
 
 
 // SuperGUI runtime stability layer.
-// Fixes stage-relative layering, responsive UI scaling, and text alignment.
+// Fixes stage-relative layering, responsive UI scaling, text alignment,
+// and keeps fullscreen from silently reflowing the GUI unless requested.
 
 const _sgOriginalBuildOverlay = SuperGUI.prototype._buildOverlay;
 const _sgOriginalSyncOverlayPosition = SuperGUI.prototype._syncOverlayPosition;
@@ -3669,6 +3670,8 @@ SuperGUI.prototype._buildOverlay = function () {
   this._overlayHost = host;
   this._uiScale = 1;
   this._lastUIScale = 1;
+  this._normalStageSize = null;
+  if (this._scaleGUIInFullscreen === undefined) this._scaleGUIInFullscreen = false;
 };
 
 SuperGUI.prototype._syncOverlayPosition = function () {
@@ -3680,21 +3683,44 @@ SuperGUI.prototype._syncOverlayPosition = function () {
   const canvasRect = canvas.getBoundingClientRect();
   const hostRect = host.getBoundingClientRect();
 
-  overlay.style.left = (canvasRect.left - hostRect.left + host.scrollLeft) + 'px';
-  overlay.style.top = (canvasRect.top - hostRect.top + host.scrollTop) + 'px';
-  overlay.style.width = canvasRect.width + 'px';
-  overlay.style.height = canvasRect.height + 'px';
+  // Remember the normal embedded stage size. Some hosts don't use the browser
+  // Fullscreen API; instead they simply enlarge the canvas. Detect that too.
+  if (!this._normalStageSize) {
+    this._normalStageSize = { width: canvasRect.width, height: canvasRect.height };
+  }
+
+  const base = this._normalStageSize;
+  const browserFullscreen = !!document.fullscreenElement;
+  const expandedByHost = canvasRect.width > base.width * 1.20 && canvasRect.height > base.height * 1.20;
+  const fullscreenLike = browserFullscreen || expandedByHost;
+
+  // While not fullscreen-like, keep following ordinary editor/layout resizes so
+  // the remembered size does not become stale.
+  if (!fullscreenLike) {
+    this._normalStageSize = { width: canvasRect.width, height: canvasRect.height };
+  }
+
+  const useFrozenSize = fullscreenLike && !this._scaleGUIInFullscreen;
+  const overlayWidth = useFrozenSize ? this._normalStageSize.width : canvasRect.width;
+  const overlayHeight = useFrozenSize ? this._normalStageSize.height : canvasRect.height;
+  const offsetX = useFrozenSize ? (canvasRect.width - overlayWidth) / 2 : 0;
+  const offsetY = useFrozenSize ? (canvasRect.height - overlayHeight) / 2 : 0;
+
+  overlay.style.left = (canvasRect.left - hostRect.left + host.scrollLeft + offsetX) + 'px';
+  overlay.style.top = (canvasRect.top - hostRect.top + host.scrollTop + offsetY) + 'px';
+  overlay.style.width = overlayWidth + 'px';
+  overlay.style.height = overlayHeight + 'px';
 
   // Scratch/PenguinMod's logical stage is 480x360. Geometry is percentage based,
-  // but typography/padding/borders are pixel based, so scale those with the stage.
-  const sx = canvasRect.width / 480;
-  const sy = canvasRect.height / 360;
+  // but typography/padding/borders are pixel based, so scale those with whichever
+  // stage size the GUI is actually using.
+  const sx = overlayWidth / 480;
+  const sy = overlayHeight / 360;
   const nextScale = Math.max(0.1, Math.min(sx, sy));
   this._uiScale = nextScale;
 
   if (Math.abs(nextScale - (this._lastUIScale || 1)) > 0.01) {
     this._lastUIScale = nextScale;
-    // Re-render only when the actual stage scale changed, not every sync tick.
     if (this.panelDoms && Object.keys(this.panelDoms).length) this._renderAll();
   }
 };
@@ -3728,14 +3754,12 @@ function _sgApplyTextAlignment(wrap, el) {
   const align = String(el.style.textAlign || 'left').toLowerCase();
   const justify = align === 'center' ? 'center' : (align === 'right' ? 'flex-end' : 'flex-start');
 
-  // Keep CSS text alignment for normal block/button content.
   const nodes = [wrap].concat(Array.from(wrap.querySelectorAll ? wrap.querySelectorAll('*') : []));
   for (const node of nodes) {
     if (!node.style) continue;
     if (node.style.textAlign) node.style.textAlign = align;
   }
 
-  // Labels are rendered as flexboxes; text-align alone does nothing there.
   if (el.type === 'label') {
     const label = wrap.firstElementChild;
     if (label) {
@@ -3754,8 +3778,6 @@ SuperGUI.prototype._createElementDom = function (panelKey, elId, el) {
   return wrap;
 };
 
-// Keep the overlay attached to the stage if the host replaces/reparents its canvas
-// during fullscreen/player-mode transitions.
 SuperGUI.prototype._ensureOverlayHost = function () {
   const canvas = this.runtime && this.runtime.renderer && this.runtime.renderer.canvas;
   if (!canvas || !this.overlay || !canvas.parentElement) return;
@@ -4224,6 +4246,84 @@ SuperGUI.prototype.setTerminalInputEnabledV6=function(a){const f=v602Find(this,a
 SuperGUI.prototype.setTerminalEchoV6=function(a){const f=v602Find(this,a.E);if(!f||f.el.type!=='terminal')return;f.el.terminalEcho=!!a.ENABLED;this._renderPanel(f.panelKey);};
 SuperGUI.prototype.focusTerminalV6=function(a){const n=this.elementDoms&&this.elementDoms[a.E];const i=n&&n.querySelector('input');if(i)i.focus();};
 SuperGUI.prototype.getTerminalHistoryV6=function(a){const f=v602Find(this,a.E);return f&&f.el.type==='terminal'?JSON.stringify(f.el.commandHistory||[]):'[]';};
+
+
+// SuperGUI fullscreen scaling controls.
+// Default: preserve the GUI's pre-fullscreen physical size instead of enlarging it.
+
+const _sgFullscreenOriginalGetInfo = SuperGUI.prototype.getInfo;
+SuperGUI.prototype.getInfo = function () {
+  const info = _sgFullscreenOriginalGetInfo.call(this);
+  const B = Scratch.BlockType, S = Scratch.ArgumentType;
+  info.menus = info.menus || {};
+  info.menus.fullscreenGuiScaling = {acceptReporters:false, items:['on','off']};
+  const blocks = [
+    {blockType:B.LABEL,text:'─── Fullscreen scaling ───'},
+    {opcode:'setFullscreenGUIScaling',blockType:B.COMMAND,text:'set GUI scaling in fullscreen [STATE]',arguments:{STATE:{type:S.STRING,menu:'fullscreenGuiScaling',defaultValue:'off'}}},
+    {opcode:'isFullscreenGUIScalingEnabled',blockType:B.BOOLEAN,text:'GUI scales in fullscreen?'}
+  ];
+  info.blocks = blocks.concat(info.blocks || []);
+  return info;
+};
+
+SuperGUI.prototype.setFullscreenGUIScaling = function (a) {
+  this._scaleGUIInFullscreen = String(a.STATE || 'off').toLowerCase() === 'on';
+  this._syncOverlayPosition();
+  if (this.panelDoms && Object.keys(this.panelDoms).length) this._renderAll();
+};
+
+SuperGUI.prototype.isFullscreenGUIScalingEnabled = function () {
+  return !!this._scaleGUIInFullscreen;
+};
+
+// Override the stability layer's sync with two fullscreen behaviors:
+// OFF (default): remember the pre-fullscreen stage size and keep the GUI that size.
+// ON: let the GUI expand and reflow with the rendered fullscreen stage.
+SuperGUI.prototype._syncOverlayPosition = function () {
+  this._ensureOverlayHost && this._ensureOverlayHost();
+  const canvas = this.runtime && this.runtime.renderer && this.runtime.renderer.canvas;
+  const overlay = this.overlay;
+  if (!canvas || !overlay) return;
+
+  const host = this._overlayHost || overlay.parentElement || document.body;
+  const canvasRect = canvas.getBoundingClientRect();
+  const hostRect = host.getBoundingClientRect();
+  if (!canvasRect.width || !canvasRect.height) return;
+
+  const explicitFullscreen = !!document.fullscreenElement;
+  const remembered = this._preFullscreenStageSize;
+  const sizeJumpFullscreen = !!remembered &&
+    (canvasRect.width > remembered.width * 1.3 || canvasRect.height > remembered.height * 1.3);
+  const fullscreenLike = explicitFullscreen || sizeJumpFullscreen;
+
+  // Learn/update the ordinary embedded stage size only while we are not fullscreen.
+  if (!fullscreenLike) {
+    this._preFullscreenStageSize = {width:canvasRect.width, height:canvasRect.height};
+  }
+
+  const base = this._preFullscreenStageSize || {width:canvasRect.width, height:canvasRect.height};
+  const scaleInFullscreen = !!this._scaleGUIInFullscreen;
+  const freeze = fullscreenLike && !scaleInFullscreen;
+  const width = freeze ? Math.min(base.width, canvasRect.width) : canvasRect.width;
+  const height = freeze ? Math.min(base.height, canvasRect.height) : canvasRect.height;
+  const insetX = freeze ? (canvasRect.width - width) / 2 : 0;
+  const insetY = freeze ? (canvasRect.height - height) / 2 : 0;
+
+  overlay.style.left = (canvasRect.left - hostRect.left + host.scrollLeft + insetX) + 'px';
+  overlay.style.top = (canvasRect.top - hostRect.top + host.scrollTop + insetY) + 'px';
+  overlay.style.width = width + 'px';
+  overlay.style.height = height + 'px';
+
+  const sx = width / 480;
+  const sy = height / 360;
+  const nextScale = Math.max(0.1, Math.min(sx, sy));
+  this._uiScale = nextScale;
+
+  if (Math.abs(nextScale - (this._lastUIScale || 1)) > 0.01) {
+    this._lastUIScale = nextScale;
+    if (this.panelDoms && Object.keys(this.panelDoms).length) this._renderAll();
+  }
+};
 
 
   // Hosts expose the VM in slightly different places. Prefer the public Scratch
