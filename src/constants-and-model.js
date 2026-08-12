@@ -11,7 +11,7 @@ export const ELEMENT_TYPES = [
   'colorpicker', 'selector', 'search', 'imagebutton', 'counter', 'badge',
   'spinner', 'divider', 'video', 'rating', 'healthbar', 'joystick', 'dpad',
   'tabs', 'accordion', 'knob', 'carousel', 'code', 'particles', 'canvas',
-  'tooltip', 'achievement', 'leaderboard'
+  'tooltip', 'achievement', 'leaderboard', 'container'
 ];
 
 export const EASINGS = {
@@ -72,6 +72,7 @@ export function defaultElement(type) {
       case 'code': return Object.assign(base, { code:'// code', theme:'dark', width:50, height:30 });
       case 'particles': return Object.assign(base, { color:'#ffffff', count:20, speed:2, lifetime:1, gravity:0, size:3, width:40, height:40 });
       case 'canvas': return Object.assign(base, { width:50, height:30 });
+      case 'container': return Object.assign(base, { layoutMode:'vertical', layoutGap:8, layoutPadding:8, layoutOverflow:'auto', layoutAlign:'stretch', layoutJustify:'start', layoutWrap:false, layoutColumns:2, children:[], width:60, height:55 });
       case 'tooltip': return Object.assign(base, { text:'Tooltip', position:'top', delay:500, background:'#232735', textColor:'#ffffff', width:18, height:6 });
       case 'achievement': return Object.assign(base, { achievementId:'', title:'Achievement unlocked!', description:'A new milestone reached', icon:'🏆', points:10, progress:1, target:1, unlocked:true, accent:'#ffd166', width:58, height:18 });
       case 'leaderboard': return Object.assign(base, { boardId:'main', title:'Leaderboard', entries:[], maxVisible:5, highlightPlayer:'', accent:'#5B6EE1', width:52, height:55 });
