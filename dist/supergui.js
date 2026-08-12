@@ -1,4 +1,4 @@
-// SuperGUI v6.0.3 - generated file; edit src/ and run `npm run build`.
+// SuperGUI v6.0.4 - generated file; edit src/ and run `npm run build`.
 // Load this file as an unsandboxed custom extension in PenguinMod, TurboWarp, or Gandi IDE.
 (function (Scratch) {
   'use strict';
@@ -4249,7 +4249,7 @@ SuperGUI.prototype.getTerminalHistoryV6=function(a){const f=v602Find(this,a.E);r
 
 
 // SuperGUI fullscreen scaling controls.
-// Default: preserve the GUI's pre-fullscreen physical size instead of enlarging it.
+// Default OFF means preserve the pre-fullscreen layout and uniformly scale it as one finished UI.
 
 const _sgFullscreenOriginalGetInfo = SuperGUI.prototype.getInfo;
 SuperGUI.prototype.getInfo = function () {
@@ -4259,8 +4259,8 @@ SuperGUI.prototype.getInfo = function () {
   info.menus.fullscreenGuiScaling = {acceptReporters:false, items:['on','off']};
   const blocks = [
     {blockType:B.LABEL,text:'─── Fullscreen scaling ───'},
-    {opcode:'setFullscreenGUIScaling',blockType:B.COMMAND,text:'set GUI scaling in fullscreen [STATE]',arguments:{STATE:{type:S.STRING,menu:'fullscreenGuiScaling',defaultValue:'off'}}},
-    {opcode:'isFullscreenGUIScalingEnabled',blockType:B.BOOLEAN,text:'GUI scales in fullscreen?'}
+    {opcode:'setFullscreenGUIScaling',blockType:B.COMMAND,text:'set GUI responsive reflow in fullscreen [STATE]',arguments:{STATE:{type:S.STRING,menu:'fullscreenGuiScaling',defaultValue:'off'}}},
+    {opcode:'isFullscreenGUIScalingEnabled',blockType:B.BOOLEAN,text:'GUI responsive reflow in fullscreen?'}
   ];
   info.blocks = blocks.concat(info.blocks || []);
   return info;
@@ -4276,9 +4276,31 @@ SuperGUI.prototype.isFullscreenGUIScalingEnabled = function () {
   return !!this._scaleGUIInFullscreen;
 };
 
-// Override the stability layer's sync with two fullscreen behaviors:
-// OFF (default): remember the pre-fullscreen stage size and keep the GUI that size.
-// ON: let the GUI expand and reflow with the rendered fullscreen stage.
+function _sgEditorWorkspaceVisible() {
+  // Blockly/Scratch hosts use slightly different wrappers. Only show the editor launcher
+  // while a real blocks workspace is visible; player/fullscreen pages should never show it.
+  const candidates = document.querySelectorAll('.blocklySvg, .blocklyWorkspace, .injectionDiv, [class*="blocks_blocks"], [class*="blocks-wrapper"]');
+  for (const node of candidates) {
+    if (!node || !node.isConnected) continue;
+    const style = getComputedStyle(node);
+    if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0) continue;
+    const r = node.getBoundingClientRect();
+    if (r.width > 20 && r.height > 20) return true;
+  }
+  return false;
+}
+
+SuperGUI.prototype._syncEditorLauncherVisibility = function () {
+  if (!this._editorLauncher) return;
+  const show = _sgEditorWorkspaceVisible() && !document.fullscreenElement;
+  this._editorLauncher.style.display = show ? '' : 'none';
+};
+
+// Two fullscreen behaviors:
+// OFF (default): freeze the normal layout coordinate system, then uniformly magnify
+// the entire completed GUI. Nothing inside reflows or changes proportions.
+// ON: resize the overlay to the current stage and let percentage layout + pixel styles
+// recompute responsively, matching the old behavior.
 SuperGUI.prototype._syncOverlayPosition = function () {
   this._ensureOverlayHost && this._ensureOverlayHost();
   const canvas = this.runtime && this.runtime.renderer && this.runtime.renderer.canvas;
@@ -4296,24 +4318,39 @@ SuperGUI.prototype._syncOverlayPosition = function () {
     (canvasRect.width > remembered.width * 1.3 || canvasRect.height > remembered.height * 1.3);
   const fullscreenLike = explicitFullscreen || sizeJumpFullscreen;
 
-  // Learn/update the ordinary embedded stage size only while we are not fullscreen.
   if (!fullscreenLike) {
     this._preFullscreenStageSize = {width:canvasRect.width, height:canvasRect.height};
   }
 
   const base = this._preFullscreenStageSize || {width:canvasRect.width, height:canvasRect.height};
-  const scaleInFullscreen = !!this._scaleGUIInFullscreen;
-  const freeze = fullscreenLike && !scaleInFullscreen;
-  const width = freeze ? Math.min(base.width, canvasRect.width) : canvasRect.width;
-  const height = freeze ? Math.min(base.height, canvasRect.height) : canvasRect.height;
-  const insetX = freeze ? (canvasRect.width - width) / 2 : 0;
-  const insetY = freeze ? (canvasRect.height - height) / 2 : 0;
+  const responsive = !!this._scaleGUIInFullscreen;
+  const uniformMode = fullscreenLike && !responsive;
+
+  let width = canvasRect.width;
+  let height = canvasRect.height;
+  let transformScale = 1;
+  let insetX = 0;
+  let insetY = 0;
+
+  if (uniformMode) {
+    width = base.width;
+    height = base.height;
+    transformScale = Math.max(0.01, Math.min(canvasRect.width / base.width, canvasRect.height / base.height));
+    const renderedWidth = width * transformScale;
+    const renderedHeight = height * transformScale;
+    insetX = (canvasRect.width - renderedWidth) / 2;
+    insetY = (canvasRect.height - renderedHeight) / 2;
+  }
 
   overlay.style.left = (canvasRect.left - hostRect.left + host.scrollLeft + insetX) + 'px';
   overlay.style.top = (canvasRect.top - hostRect.top + host.scrollTop + insetY) + 'px';
   overlay.style.width = width + 'px';
   overlay.style.height = height + 'px';
+  overlay.style.transformOrigin = 'top left';
+  overlay.style.transform = uniformMode ? `scale(${transformScale})` : 'none';
 
+  // In uniform mode, pixel styling is calculated for the original stage and the browser
+  // transform scales it together with geometry. Responsive mode recalculates pixel styling.
   const sx = width / 480;
   const sy = height / 360;
   const nextScale = Math.max(0.1, Math.min(sx, sy));
@@ -4323,6 +4360,8 @@ SuperGUI.prototype._syncOverlayPosition = function () {
     this._lastUIScale = nextScale;
     if (this.panelDoms && Object.keys(this.panelDoms).length) this._renderAll();
   }
+
+  this._syncEditorLauncherVisibility();
 };
 
 
