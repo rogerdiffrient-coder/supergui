@@ -53,7 +53,7 @@ SuperGUI.prototype.getInfo = function () {
     { opcode:'setLeaderboardRowHeight', blockType:B.COMMAND, text:'set leaderboard [E] row height [N] px', arguments:{ E:str('elements'), N:num(30) } }
   ];
 
-  info.blocks = v5xBlocks.concat(info.blocks || []);
+  info.blocks = v5xBlocks.concat(info.blocks || []).filter(block => block.opcode !== 'openEditor');
 
   if (this._compactPalette === undefined) this._compactPalette = true;
   if (this._compactPalette) {

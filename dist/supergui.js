@@ -385,6 +385,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
 button.danger { color:var(--danger); }
 button.chrome { width:26px; height:26px; padding:0; font-size:14px; }
+select { background:var(--panel2); color:var(--text); border:1px solid var(--border); padding:6px 10px; border-radius:7px; cursor:pointer; font-size:12px; color-scheme:dark; }
+select:hover { border-color:var(--accent); background:#34394d; }
+select option, select optgroup { background:var(--panel2); color:var(--text); }
+.toolbar select { min-height:30px; }
 .layout { flex:1; display:flex; min-height:0; }
 .sidebar { width:250px; background:var(--panel); border-right:1px solid var(--border); display:flex; flex-direction:column; padding:12px; gap:6px; overflow-y:auto; }
 .sidebar h2 { font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-dim); margin:8px 0 4px; }
@@ -3191,7 +3195,7 @@ SuperGUI.prototype.getInfo = function () {
     { opcode:'setLeaderboardRowHeight', blockType:B.COMMAND, text:'set leaderboard [E] row height [N] px', arguments:{ E:str('elements'), N:num(30) } }
   ];
 
-  info.blocks = v5xBlocks.concat(info.blocks || []);
+  info.blocks = v5xBlocks.concat(info.blocks || []).filter(block => block.opcode !== 'openEditor');
 
   if (this._compactPalette === undefined) this._compactPalette = true;
   if (this._compactPalette) {
