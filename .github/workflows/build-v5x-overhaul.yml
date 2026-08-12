@@ -19,17 +19,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Patch editor
+        run: python3 scripts/patch-v5x-editor.py
       - name: Build
         run: npm run build
       - name: Test
         run: |
           npm test
           npm run check
-      - name: Commit generated bundle
+      - name: Commit generated changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add dist/supergui.js
-          git commit -m "build: regenerate SuperGUI v5.1 bundle [v5x-build]"
+          git add src/editor/editor-template.js dist/supergui.js
+          git commit -m "build: generate SuperGUI v5.1 editor and bundle [v5x-build]"
           git pull --rebase origin feature/supergui-v5x-overhaul
           git push origin feature/supergui-v5x-overhaul
