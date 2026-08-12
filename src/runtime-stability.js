@@ -1,5 +1,6 @@
 // SuperGUI runtime stability layer.
-// Fixes stage-relative layering, responsive UI scaling, and text alignment.
+// Fixes stage-relative layering, responsive UI scaling, text alignment,
+// and keeps fullscreen from silently reflowing the GUI unless requested.
 
 const _sgOriginalBuildOverlay = SuperGUI.prototype._buildOverlay;
 const _sgOriginalSyncOverlayPosition = SuperGUI.prototype._syncOverlayPosition;
@@ -28,6 +29,8 @@ SuperGUI.prototype._buildOverlay = function () {
   this._overlayHost = host;
   this._uiScale = 1;
   this._lastUIScale = 1;
+  this._normalStageSize = null;
+  if (this._scaleGUIInFullscreen === undefined) this._scaleGUIInFullscreen = false;
 };
 
 SuperGUI.prototype._syncOverlayPosition = function () {
@@ -39,21 +42,44 @@ SuperGUI.prototype._syncOverlayPosition = function () {
   const canvasRect = canvas.getBoundingClientRect();
   const hostRect = host.getBoundingClientRect();
 
-  overlay.style.left = (canvasRect.left - hostRect.left + host.scrollLeft) + 'px';
-  overlay.style.top = (canvasRect.top - hostRect.top + host.scrollTop) + 'px';
-  overlay.style.width = canvasRect.width + 'px';
-  overlay.style.height = canvasRect.height + 'px';
+  // Remember the normal embedded stage size. Some hosts don't use the browser
+  // Fullscreen API; instead they simply enlarge the canvas. Detect that too.
+  if (!this._normalStageSize) {
+    this._normalStageSize = { width: canvasRect.width, height: canvasRect.height };
+  }
+
+  const base = this._normalStageSize;
+  const browserFullscreen = !!document.fullscreenElement;
+  const expandedByHost = canvasRect.width > base.width * 1.20 && canvasRect.height > base.height * 1.20;
+  const fullscreenLike = browserFullscreen || expandedByHost;
+
+  // While not fullscreen-like, keep following ordinary editor/layout resizes so
+  // the remembered size does not become stale.
+  if (!fullscreenLike) {
+    this._normalStageSize = { width: canvasRect.width, height: canvasRect.height };
+  }
+
+  const useFrozenSize = fullscreenLike && !this._scaleGUIInFullscreen;
+  const overlayWidth = useFrozenSize ? this._normalStageSize.width : canvasRect.width;
+  const overlayHeight = useFrozenSize ? this._normalStageSize.height : canvasRect.height;
+  const offsetX = useFrozenSize ? (canvasRect.width - overlayWidth) / 2 : 0;
+  const offsetY = useFrozenSize ? (canvasRect.height - overlayHeight) / 2 : 0;
+
+  overlay.style.left = (canvasRect.left - hostRect.left + host.scrollLeft + offsetX) + 'px';
+  overlay.style.top = (canvasRect.top - hostRect.top + host.scrollTop + offsetY) + 'px';
+  overlay.style.width = overlayWidth + 'px';
+  overlay.style.height = overlayHeight + 'px';
 
   // Scratch/PenguinMod's logical stage is 480x360. Geometry is percentage based,
-  // but typography/padding/borders are pixel based, so scale those with the stage.
-  const sx = canvasRect.width / 480;
-  const sy = canvasRect.height / 360;
+  // but typography/padding/borders are pixel based, so scale those with whichever
+  // stage size the GUI is actually using.
+  const sx = overlayWidth / 480;
+  const sy = overlayHeight / 360;
   const nextScale = Math.max(0.1, Math.min(sx, sy));
   this._uiScale = nextScale;
 
   if (Math.abs(nextScale - (this._lastUIScale || 1)) > 0.01) {
     this._lastUIScale = nextScale;
-    // Re-render only when the actual stage scale changed, not every sync tick.
     if (this.panelDoms && Object.keys(this.panelDoms).length) this._renderAll();
   }
 };
@@ -87,14 +113,12 @@ function _sgApplyTextAlignment(wrap, el) {
   const align = String(el.style.textAlign || 'left').toLowerCase();
   const justify = align === 'center' ? 'center' : (align === 'right' ? 'flex-end' : 'flex-start');
 
-  // Keep CSS text alignment for normal block/button content.
   const nodes = [wrap].concat(Array.from(wrap.querySelectorAll ? wrap.querySelectorAll('*') : []));
   for (const node of nodes) {
     if (!node.style) continue;
     if (node.style.textAlign) node.style.textAlign = align;
   }
 
-  // Labels are rendered as flexboxes; text-align alone does nothing there.
   if (el.type === 'label') {
     const label = wrap.firstElementChild;
     if (label) {
@@ -113,8 +137,6 @@ SuperGUI.prototype._createElementDom = function (panelKey, elId, el) {
   return wrap;
 };
 
-// Keep the overlay attached to the stage if the host replaces/reparents its canvas
-// during fullscreen/player-mode transitions.
 SuperGUI.prototype._ensureOverlayHost = function () {
   const canvas = this.runtime && this.runtime.renderer && this.runtime.renderer.canvas;
   if (!canvas || !this.overlay || !canvas.parentElement) return;
