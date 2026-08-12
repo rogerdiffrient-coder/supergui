@@ -11,7 +11,8 @@ export const ELEMENT_TYPES = [
   'colorpicker', 'selector', 'search', 'imagebutton', 'counter', 'badge',
   'spinner', 'divider', 'video', 'rating', 'healthbar', 'joystick', 'dpad',
   'tabs', 'accordion', 'knob', 'carousel', 'code', 'particles', 'canvas',
-  'tooltip', 'achievement', 'leaderboard', 'container'
+  'tooltip', 'achievement', 'leaderboard', 'container',
+  'icon', 'avatar', 'card', 'panelheader', 'breadcrumb', 'pagination', 'notification', 'toast', 'alert', 'chip', 'tag', 'pill', 'meter', 'gauge', 'thermometer', 'sparkline', 'barchart', 'linechart', 'piechart', 'minimap', 'mapmarker', 'clock', 'timer', 'calendar', 'datepicker', 'filepicker', 'textarea', 'passwordinput', 'emailinput', 'urlinput', 'stepper', 'segmentedcontrol', 'toolbar', 'menubar', 'contextmenu', 'treeview', 'list', 'listitem', 'table', 'datagrid', 'statcard', 'keycap', 'hotkey', 'spacer', 'scrollarea', 'iframe', 'markdown', 'richtext', 'terminal', 'chatbubble'
 ];
 
 export const EASINGS = {
@@ -76,6 +77,57 @@ export function defaultElement(type) {
       case 'tooltip': return Object.assign(base, { text:'Tooltip', position:'top', delay:500, background:'#232735', textColor:'#ffffff', width:18, height:6 });
       case 'achievement': return Object.assign(base, { achievementId:'', title:'Achievement unlocked!', description:'A new milestone reached', icon:'🏆', points:10, progress:1, target:1, unlocked:true, accent:'#ffd166', width:58, height:18 });
       case 'leaderboard': return Object.assign(base, { boardId:'main', title:'Leaderboard', entries:[], maxVisible:5, highlightPlayer:'', accent:'#5B6EE1', width:52, height:55 });
+      case 'icon':
+      case 'avatar':
+      case 'card':
+      case 'panelheader':
+      case 'breadcrumb':
+      case 'pagination':
+      case 'notification':
+      case 'toast':
+      case 'alert':
+      case 'chip':
+      case 'tag':
+      case 'pill':
+      case 'meter':
+      case 'gauge':
+      case 'thermometer':
+      case 'sparkline':
+      case 'barchart':
+      case 'linechart':
+      case 'piechart':
+      case 'minimap':
+      case 'mapmarker':
+      case 'clock':
+      case 'timer':
+      case 'calendar':
+      case 'datepicker':
+      case 'filepicker':
+      case 'textarea':
+      case 'passwordinput':
+      case 'emailinput':
+      case 'urlinput':
+      case 'stepper':
+      case 'segmentedcontrol':
+      case 'toolbar':
+      case 'menubar':
+      case 'contextmenu':
+      case 'treeview':
+      case 'list':
+      case 'listitem':
+      case 'table':
+      case 'datagrid':
+      case 'statcard':
+      case 'keycap':
+      case 'hotkey':
+      case 'spacer':
+      case 'scrollarea':
+      case 'iframe':
+      case 'markdown':
+      case 'richtext':
+      case 'terminal':
+      case 'chatbubble':
+        return Object.assign(base, { text:type.charAt(0).toUpperCase()+type.slice(1), value:'', icon:'', image:'', items:[], v6Data:{}, width:40, height:18 });
       default: return base;
     }
   }

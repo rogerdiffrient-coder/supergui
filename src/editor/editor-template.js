@@ -28,7 +28,7 @@ select option, select optgroup { background:var(--panel2); color:var(--text); }
 .list-item span.name { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .list-item button { padding:1px 5px; font-size:10px; }
 .center { flex:1; display:flex; flex-direction:column; min-width:0; }
-.toolbar { display:flex; gap:6px; padding:8px 10px; background:var(--panel); border-bottom:1px solid var(--border); flex-wrap:wrap; align-items:center; }
+.toolbar { display:flex; gap:6px; scrollbar-width:thin; padding:8px 10px; background:var(--panel); border-bottom:1px solid var(--border); flex-wrap:wrap; align-items:center; }
 .canvas-area { flex:1; display:flex; align-items:center; justify-content:center; overflow:auto; background:repeating-conic-gradient(#20232e 0% 25%,#1b1e29 0% 50%) 0 0/20px 20px; }
 #stage { position:relative; width:480px; height:360px; background:#10131c; border:2px solid var(--border); border-radius:5px; overflow:hidden; flex-shrink:0; box-shadow:0 18px 45px #0008; }
 .ed-panel { position:absolute; box-sizing:border-box; overflow:hidden; }
@@ -61,7 +61,7 @@ select#addElementType option { color:var(--text); font-weight:400; }
 </style></head>
 <body>
 <header>
-  <h1>SuperGUI Editor</h1>
+  <h1>SuperGUI Editor <span style="font-size:10px;opacity:.6">v6</span></h1>
   <button id="btnAddPanel">+ Panel</button>
   <button id="btnPreview">Preview</button>
   <button id="btnImport">Import</button>
@@ -105,6 +105,64 @@ select#addElementType option { color:var(--text); font-weight:400; }
       </optgroup>
       <optgroup label="Game input">
         <option value="joystick">Joystick</option><option value="dpad">D-Pad</option>
+      </optgroup>
+      <optgroup label="v6 — App & navigation">
+        <option value="icon">Icon</option>
+        <option value="avatar">Avatar</option>
+        <option value="card">Card</option>
+        <option value="panelheader">Panel Header</option>
+        <option value="breadcrumb">Breadcrumbs</option>
+        <option value="pagination">Pagination</option>
+        <option value="notification">Notification</option>
+        <option value="toast">Toast</option>
+        <option value="alert">Alert</option>
+        <option value="chip">Chip</option>
+        <option value="tag">Tag</option>
+        <option value="pill">Pill</option>
+      </optgroup>
+      <optgroup label="v6 — Data & visuals">
+        <option value="meter">Meter</option>
+        <option value="gauge">Gauge</option>
+        <option value="thermometer">Thermometer</option>
+        <option value="sparkline">Sparkline</option>
+        <option value="barchart">Bar Chart</option>
+        <option value="linechart">Line Chart</option>
+        <option value="piechart">Pie Chart</option>
+        <option value="minimap">Mini Map</option>
+        <option value="mapmarker">Map Marker</option>
+        <option value="clock">Clock</option>
+        <option value="timer">Timer</option>
+        <option value="calendar">Calendar</option>
+        <option value="datepicker">Date Picker</option>
+      </optgroup>
+      <optgroup label="v6 — Inputs & structure">
+        <option value="filepicker">File Picker</option>
+        <option value="textarea">Text Area</option>
+        <option value="passwordinput">Password Input</option>
+        <option value="emailinput">Email Input</option>
+        <option value="urlinput">URL Input</option>
+        <option value="stepper">Stepper</option>
+        <option value="segmentedcontrol">Segmented Control</option>
+        <option value="toolbar">Toolbar</option>
+        <option value="menubar">Menu Bar</option>
+        <option value="contextmenu">Context Menu</option>
+        <option value="treeview">Tree View</option>
+        <option value="list">List</option>
+        <option value="listitem">List Item</option>
+        <option value="table">Table</option>
+        <option value="datagrid">Data Grid</option>
+      </optgroup>
+      <optgroup label="v6 — Content & advanced">
+        <option value="statcard">Stat Card</option>
+        <option value="keycap">Key Cap</option>
+        <option value="hotkey">Hotkey</option>
+        <option value="spacer">Spacer</option>
+        <option value="scrollarea">Scroll Area</option>
+        <option value="iframe">Web Embed</option>
+        <option value="markdown">Markdown</option>
+        <option value="richtext">Rich Text</option>
+        <option value="terminal">Terminal</option>
+        <option value="chatbubble">Chat Bubble</option>
       </optgroup>
     </select>
     <button id="btnAddElement" class="primary" style="margin-top:4px;">+ Add</button>
