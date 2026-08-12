@@ -1625,6 +1625,57 @@ export class SuperGUI {
           if (!(el.entries || []).length) { const empty = document.createElement('div'); empty.textContent = 'No scores yet'; empty.style.cssText = 'padding:12px;text-align:center;opacity:.55;font-size:11px;'; body.appendChild(empty); }
           n.appendChild(body); wrap.appendChild(n); break;
         }
+        case 'icon':
+        case 'avatar':
+        case 'card':
+        case 'panelheader':
+        case 'breadcrumb':
+        case 'pagination':
+        case 'notification':
+        case 'toast':
+        case 'alert':
+        case 'chip':
+        case 'tag':
+        case 'pill':
+        case 'meter':
+        case 'gauge':
+        case 'thermometer':
+        case 'sparkline':
+        case 'barchart':
+        case 'linechart':
+        case 'piechart':
+        case 'minimap':
+        case 'mapmarker':
+        case 'clock':
+        case 'timer':
+        case 'calendar':
+        case 'datepicker':
+        case 'filepicker':
+        case 'textarea':
+        case 'passwordinput':
+        case 'emailinput':
+        case 'urlinput':
+        case 'stepper':
+        case 'segmentedcontrol':
+        case 'toolbar':
+        case 'menubar':
+        case 'contextmenu':
+        case 'treeview':
+        case 'list':
+        case 'listitem':
+        case 'table':
+        case 'datagrid':
+        case 'statcard':
+        case 'keycap':
+        case 'hotkey':
+        case 'spacer':
+        case 'scrollarea':
+        case 'iframe':
+        case 'markdown':
+        case 'richtext':
+        case 'terminal':
+        case 'chatbubble':
+          this._createV6ElementDom(panelKey, elId, el, wrap); break;
       }
 
       wrap.querySelectorAll('button,input,select,textarea').forEach(control => {

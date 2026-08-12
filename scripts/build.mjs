@@ -14,7 +14,8 @@ const SOURCE_FILES = [
   'src/super-gui.js',
   'src/v5-layout.js',
   'src/v5x-overhaul.js',
-  'src/runtime-stability.js'
+  'src/runtime-stability.js',
+  'src/v6.js'
 ];
 export const OUTPUT = path.join(ROOT, 'dist/supergui.js');
 
