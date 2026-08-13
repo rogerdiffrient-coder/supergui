@@ -9,11 +9,12 @@ import { buildBundle, OUTPUT } from '../scripts/build.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = file => readFile(path.join(ROOT, file), 'utf8');
-const [runtime, gameServices, model, editor, bundle] = await Promise.all([
+const [runtime, gameServices, model, editor, categories, bundle] = await Promise.all([
   read('src/super-gui.js'),
   read('src/game-services.js'),
   read('src/constants-and-model.js'),
   read('src/editor/editor-template.js'),
+  read('src/real-categories.js'),
   readFile(OUTPUT, 'utf8')
 ]);
 
@@ -42,11 +43,14 @@ assert.deepEqual(elementTypes, defaultTypes, 'model defaults do not cover every 
 assert.deepEqual(elementTypes, editorTypes, 'editor does not cover every element type');
 assert.deepEqual(elementTypes, renderedTypes, 'renderer does not cover every element type');
 assert.ok(!renderer.slice(renderer.indexOf("case 'joystick'"), renderer.indexOf("case 'carousel'")).includes("document.addEventListener('mousemove', onMove);"), 'interactive controls leaked global listeners');
-assert.ok(bundle.includes('Scratch.extensions.register(new SuperGUI(runtime))'), 'bundle does not register');
+assert.ok(bundle.includes('const core = new SuperGUI(runtime)'), 'bundle does not create one shared SuperGUI core');
+assert.ok(bundle.includes('Scratch.extensions.register(core)'), 'bundle does not register the core category');
+assert.ok(bundle.includes('registerSuperGUICategories(core)'), 'bundle does not register real object categories');
+assert.ok(categories.includes('new Proxy') && categories.includes('value.bind(core)'), 'category wrappers do not delegate to the shared core');
 assert.ok(bundle.includes('Scratch.runtime') && bundle.includes('globalThis.vm'), 'bundle must support host runtime locations');
 for (const host of ['PenguinMod', 'TurboWarp', 'Gandi IDE']) {
   assert.ok(bundle.includes(host), `bundle does not identify ${host} support`);
 }
 assert.ok(!bundle.includes('import {') && !bundle.includes('export class'), 'module syntax leaked into bundle');
 
-console.log(`OK: ${opcodes.length} blocks, ${methods.size} methods, categorized editor, current bundle`);
+console.log(`OK: ${opcodes.length} blocks, ${methods.size} methods, categorized editor, shared-core toolbox categories, current bundle`);

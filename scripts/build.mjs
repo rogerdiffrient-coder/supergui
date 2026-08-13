@@ -21,7 +21,8 @@ const SOURCE_FILES = [
   'src/fullscreen-scaling.js',
   'src/v6-block-coverage.js',
   'src/v6-item-blocks.js',
-  'src/palette-router.js'
+  'src/palette-router.js',
+  'src/real-categories.js'
 ];
 export const OUTPUT = path.join(ROOT, 'dist/supergui.js');
 
@@ -34,7 +35,7 @@ export async function buildBundle() {
     SOURCE_FILES.map(async file => removeModuleSyntax(await readFile(path.join(ROOT, file), 'utf8')))
   );
   const body = modules.join('\n\n');
-  return `// SuperGUI v6.0.7 - generated file; edit src/ and run \`npm run build\`.
+  return `// SuperGUI v6.0.8 - generated file; edit src/ and run \`npm run build\`.
 // Load this file as an unsandboxed custom extension in PenguinMod, TurboWarp, or Gandi IDE.
 (function (Scratch) {
   'use strict';
@@ -47,7 +48,11 @@ ${body}
   const runtime = (Scratch.vm && Scratch.vm.runtime) || Scratch.runtime ||
     (globalThis.vm && globalThis.vm.runtime);
   if (!runtime) throw new Error('SuperGUI could not find the Scratch runtime.');
-  Scratch.extensions.register(new SuperGUI(runtime));
+  const core = new SuperGUI(runtime);
+  core._realCategoryMode = true;
+  core._paletteCategory = 'basic';
+  Scratch.extensions.register(core);
+  registerSuperGUICategories(core);
 })(globalThis.Scratch);
 `;
 }
