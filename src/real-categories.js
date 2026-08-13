@@ -1,66 +1,16 @@
-// SuperGUI 6.1.0: real toolbox categories with host-safe fallback.
-// One SuperGUI engine owns all state/UI. Lightweight category proxies expose
-// object-specific palettes and delegate every opcode/menu call to that engine.
+// SuperGUI 6.1.2: host-safe grouped toolbox categories.
+// One shared engine owns all state/UI. Four lightweight grouped proxies + the core = 5 categories max.
 
-const _sg610CoreGetInfo = SuperGUI.prototype.getInfo;
+const _sg612CoreGetInfo = SuperGUI.prototype.getInfo;
 SuperGUI.prototype.getInfo = function () {
-  const info = _sg610CoreGetInfo.call(this);
+  const info = _sg612CoreGetInfo.call(this);
   if (this._realCategoryMode && info && Array.isArray(info.blocks)) {
     info.blocks = info.blocks.filter(block => !(block && block.opcode === 'setBlockPaletteMode'));
   }
   return info;
 };
 
-function sg610CategoryId(category) {
-  return 'supergui' + String(category || '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '')
-    .slice(0, 42);
-}
-
-function sg610CategoryName(category) {
-  return 'SuperGUI • ' + String(category || '').replace(/\b\w/g, c => c.toUpperCase());
-}
-
-class SuperGUICategoryProxy {
-  constructor(core, category) {
-    this.core = core;
-    this.category = category;
-  }
-
-  getInfo() {
-    const old = this.core._paletteCategory;
-    this.core._paletteCategory = this.category;
-    let info;
-    try {
-      info = this.core.getInfo();
-    } finally {
-      this.core._paletteCategory = old;
-    }
-
-    const clone = {...info};
-    clone.id = sg610CategoryId(this.category);
-    clone.name = sg610CategoryName(this.category);
-    clone.blocks = (info.blocks || []).filter(block => !(block && block.opcode === 'setBlockPaletteMode'));
-    return clone;
-  }
-}
-
-function sg610ProxyFor(core, category) {
-  const target = new SuperGUICategoryProxy(core, category);
-  return new Proxy(target, {
-    get(obj, prop, receiver) {
-      if (Reflect.has(obj, prop)) return Reflect.get(obj, prop, receiver);
-      const value = core[prop];
-      return typeof value === 'function' ? value.bind(core) : value;
-    },
-    has(obj, prop) {
-      return Reflect.has(obj, prop) || prop in core;
-    }
-  });
-}
-
-function sg610InstallHatRouting(core) {
+function sg612InstallHatRouting(core) {
   const runtime = core && core.runtime;
   if (!runtime || typeof runtime.startHats !== 'function' || runtime.__superGUIHatRouter) return;
   const original = runtime.startHats.bind(runtime);
@@ -84,18 +34,16 @@ function sg610InstallHatRouting(core) {
 
 function registerSuperGUICategories(core) {
   core._superGUIProxyHatIds = Object.create(null);
-  const categories = (typeof SG607_CATEGORIES !== 'undefined' ? SG607_CATEGORIES : [])
-    .filter(category => category !== 'basic' && category !== 'all');
-
+  const groups = typeof SG612_GROUPS !== 'undefined' ? SG612_GROUPS : [];
   let attempted = 0;
   let registered = 0;
   const failures = [];
 
-  for (const category of categories) {
-    const proxy = sg610ProxyFor(core, category);
+  for (const group of groups) {
+    const proxy = sg612ProxyFor(core, group);
     let info;
     try { info = proxy.getInfo(); }
-    catch (e) { failures.push({category,error:e}); continue; }
+    catch (e) { failures.push({group:group.name,error:e}); continue; }
 
     const usefulBlocks = (info.blocks || []).filter(block => block && block.opcode);
     if (!usefulBlocks.length) continue;
@@ -112,16 +60,16 @@ function registerSuperGUICategories(core) {
         core._superGUIProxyHatIds[opcode].add(proxyId);
       }
     } catch (e) {
-      failures.push({category,error:e});
-      console.warn('[SuperGUI] toolbox category registration failed:', category, e);
+      failures.push({group:group.name,error:e});
+      console.warn('[SuperGUI] grouped toolbox registration failed:', group.name, e);
     }
   }
 
-  sg610InstallHatRouting(core);
+  sg612InstallHatRouting(core);
   return {
     attempted,
     registered,
     failures,
-    complete: attempted > 0 && registered === attempted
+    complete: attempted === groups.length && registered === attempted
   };
 }
