@@ -21,6 +21,8 @@ const SOURCE_FILES = [
   'src/fullscreen-scaling.js',
   'src/v6-block-coverage.js',
   'src/v6-item-blocks.js',
+  'src/chat-system.js',
+  'src/compatibility.js',
   'src/palette-router.js',
   'src/real-categories.js'
 ];
@@ -35,8 +37,8 @@ export async function buildBundle() {
     SOURCE_FILES.map(async file => removeModuleSyntax(await readFile(path.join(ROOT, file), 'utf8')))
   );
   const body = modules.join('\n\n');
-  return `// SuperGUI v6.0.8 - generated file; edit src/ and run \`npm run build\`.
-// Load this file as an unsandboxed custom extension in PenguinMod, TurboWarp, or Gandi IDE.
+  return `// SuperGUI v6.1.0 - generated file; edit src/ and run \`npm run build\`.
+// Load this file as an unsandboxed custom extension in PenguinMod, TurboWarp, or Cocrea / Gandi IDE.
 (function (Scratch) {
   'use strict';
   if (!Scratch || !Scratch.extensions || !Scratch.extensions.unsandboxed) {
@@ -48,11 +50,17 @@ ${body}
   const runtime = (Scratch.vm && Scratch.vm.runtime) || Scratch.runtime ||
     (globalThis.vm && globalThis.vm.runtime);
   if (!runtime) throw new Error('SuperGUI could not find the Scratch runtime.');
+
   const core = new SuperGUI(runtime);
-  core._realCategoryMode = true;
-  core._paletteCategory = 'basic';
+  // Try real object categories first. If a Scratch mod rejects proxy categories,
+  // the core falls back to one complete category so no features disappear.
+  const categoryResult = registerSuperGUICategories(core);
+  core._realCategoryMode = !!categoryResult.complete;
+  core._paletteCategory = categoryResult.complete ? 'basic' : 'all';
+  if (!categoryResult.complete) {
+    console.warn('[SuperGUI] Falling back to the complete single-category palette on this host.', categoryResult.failures || []);
+  }
   Scratch.extensions.register(core);
-  registerSuperGUICategories(core);
 })(globalThis.Scratch);
 `;
 }
