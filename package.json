@@ -1,6 +1,6 @@
 {
   "name": "supergui-scratch-extension",
-  "version": "6.1.2",
+  "version": "6.1.3",
   "description": "A visual GUI builder extension for PenguinMod, TurboWarp, and Cocrea / Gandi IDE.",
   "license": "MIT",
   "type": "module",
