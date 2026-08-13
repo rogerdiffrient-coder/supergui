@@ -1,24 +1,24 @@
-// SuperGUI 6.0.8: real PenguinMod toolbox categories.
+// SuperGUI 6.1.0: real toolbox categories with host-safe fallback.
 // One SuperGUI engine owns all state/UI. Lightweight category proxies expose
-// object-specific palettes that delegate every opcode/menu call to that engine.
+// object-specific palettes and delegate every opcode/menu call to that engine.
 
-const _sg608CoreGetInfo = SuperGUI.prototype.getInfo;
+const _sg610CoreGetInfo = SuperGUI.prototype.getInfo;
 SuperGUI.prototype.getInfo = function () {
-  const info = _sg608CoreGetInfo.call(this);
+  const info = _sg610CoreGetInfo.call(this);
   if (this._realCategoryMode && info && Array.isArray(info.blocks)) {
     info.blocks = info.blocks.filter(block => !(block && block.opcode === 'setBlockPaletteMode'));
   }
   return info;
 };
 
-function sg608CategoryId(category) {
+function sg610CategoryId(category) {
   return 'supergui' + String(category || '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '')
     .slice(0, 42);
 }
 
-function sg608CategoryName(category) {
+function sg610CategoryName(category) {
   return 'SuperGUI • ' + String(category || '').replace(/\b\w/g, c => c.toUpperCase());
 }
 
@@ -39,14 +39,14 @@ class SuperGUICategoryProxy {
     }
 
     const clone = {...info};
-    clone.id = sg608CategoryId(this.category);
-    clone.name = sg608CategoryName(this.category);
+    clone.id = sg610CategoryId(this.category);
+    clone.name = sg610CategoryName(this.category);
     clone.blocks = (info.blocks || []).filter(block => !(block && block.opcode === 'setBlockPaletteMode'));
     return clone;
   }
 }
 
-function sg608ProxyFor(core, category) {
+function sg610ProxyFor(core, category) {
   const target = new SuperGUICategoryProxy(core, category);
   return new Proxy(target, {
     get(obj, prop, receiver) {
@@ -60,19 +60,68 @@ function sg608ProxyFor(core, category) {
   });
 }
 
-function registerSuperGUICategories(core) {
-  core._realCategoryMode = true;
-  core._paletteCategory = 'basic';
+function sg610InstallHatRouting(core) {
+  const runtime = core && core.runtime;
+  if (!runtime || typeof runtime.startHats !== 'function' || runtime.__superGUIHatRouter) return;
+  const original = runtime.startHats.bind(runtime);
+  runtime.__superGUIHatRouter = {original, core};
+  runtime.startHats = function (opcode, matchFields, target) {
+    let threads = original(opcode, matchFields, target) || [];
+    const prefix = EXT_ID + '_';
+    if (typeof opcode !== 'string' || !opcode.startsWith(prefix)) return threads;
+    const shortOpcode = opcode.slice(prefix.length);
+    const ids = core._superGUIProxyHatIds && core._superGUIProxyHatIds[shortOpcode];
+    if (!ids || !ids.size) return threads;
+    for (const id of ids) {
+      try {
+        const extra = original(id + '_' + shortOpcode, matchFields, target) || [];
+        if (Array.isArray(threads) && Array.isArray(extra)) threads.push(...extra);
+      } catch (e) {}
+    }
+    return threads;
+  };
+}
 
+function registerSuperGUICategories(core) {
+  core._superGUIProxyHatIds = Object.create(null);
   const categories = (typeof SG607_CATEGORIES !== 'undefined' ? SG607_CATEGORIES : [])
     .filter(category => category !== 'basic' && category !== 'all');
 
+  let attempted = 0;
+  let registered = 0;
+  const failures = [];
+
   for (const category of categories) {
-    const proxy = sg608ProxyFor(core, category);
+    const proxy = sg610ProxyFor(core, category);
     let info;
-    try { info = proxy.getInfo(); } catch (e) { console.warn('[SuperGUI] category failed:', category, e); continue; }
+    try { info = proxy.getInfo(); }
+    catch (e) { failures.push({category,error:e}); continue; }
+
     const usefulBlocks = (info.blocks || []).filter(block => block && block.opcode);
     if (!usefulBlocks.length) continue;
-    Scratch.extensions.register(proxy);
+    attempted++;
+    try {
+      Scratch.extensions.register(proxy);
+      registered++;
+      const proxyId = info.id;
+      for (const block of usefulBlocks) {
+        if (block.blockType !== Scratch.BlockType.HAT) continue;
+        const opcode = String(block.opcode || '');
+        if (!opcode) continue;
+        if (!core._superGUIProxyHatIds[opcode]) core._superGUIProxyHatIds[opcode] = new Set();
+        core._superGUIProxyHatIds[opcode].add(proxyId);
+      }
+    } catch (e) {
+      failures.push({category,error:e});
+      console.warn('[SuperGUI] toolbox category registration failed:', category, e);
+    }
   }
+
+  sg610InstallHatRouting(core);
+  return {
+    attempted,
+    registered,
+    failures,
+    complete: attempted > 0 && registered === attempted
+  };
 }
