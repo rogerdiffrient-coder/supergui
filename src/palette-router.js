@@ -1,4 +1,4 @@
-// SuperGUI 6.0.7: final block-palette router.
+// SuperGUI 6.1.0: final block-palette router.
 // Rebuilds the palette from the complete block list so late-added blocks cannot bypass categories.
 
 const SG607_CATEGORIES = [
@@ -7,7 +7,7 @@ const SG607_CATEGORIES = [
   'notifications','badges','meter','gauge','thermometer','sparkline','bar chart','line chart','pie chart','mini map','map marker',
   'clock','timer','calendar','date picker','file picker','text area','password input','email input','url input','stepper',
   'segmented control','toolbar','menu bar','context menu','tree view','list','table / data grid','stat card','keys / hotkeys',
-  'scroll area','web embed','markdown / rich text','terminal','chat bubble','advanced v6','data / services','all'
+  'scroll area','web embed','markdown / rich text','terminal','chat','chat bubble','advanced v6','data / services','all'
 ];
 
 const SG607_CATEGORY_OPCODES = {
@@ -56,6 +56,9 @@ const SG607_CATEGORY_OPCODES = {
     'whenTerminalCommandV6','getLastTerminalCommandV6','setTerminalPromptV6','setTerminalInputEnabledV6','setTerminalEchoV6','focusTerminalV6','getTerminalHistoryV6',
     'clearTerminalHistoryV605','getTerminalPromptV605','terminalInputEnabledV605','terminalEchoEnabledV605'
   ]),
+  chat: new Set([
+    'whenChatMessageReceived','chatMessage','sendChatMessage','chatSenderName','chatSenderPFP','chatMessageSide','chatHistoryJSON','clearChatHistory'
+  ]),
   'chat bubble': new Set(['sg606ChatBubble','setChatBubbleSideV6']),
   'advanced v6': new Set([
     'setV6ItemData','getV6ItemData','setV6ItemText','setV6ItemIcon','setV6ItemItems','getV6ItemItems','addV6Item','removeV6ItemAt','clearV6Items','getV6ItemAt','getV6ItemCount',
@@ -79,7 +82,7 @@ function sg607SectionCategory(label) {
   if (/leaderboard/.test(s)) return 'leaderboard';
   if (/game services|storage|cloud|achievement|data/.test(s)) return 'data / services';
   if (/terminal/.test(s)) return 'terminal';
-  if (/chat/.test(s)) return 'chat bubble';
+  if (/chat/.test(s)) return 'chat';
   if (/v6/.test(s)) return 'advanced v6';
   return 'basic';
 }
