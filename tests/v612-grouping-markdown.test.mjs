@@ -2,24 +2,23 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-const real = await readFile(new URL('../src/real-categories.js', import.meta.url), 'utf8');
 const palette = await readFile(new URL('../src/palette-router.js', import.meta.url), 'utf8');
 const markdown = await readFile(new URL('../src/markdown-support.js', import.meta.url), 'utf8');
 const build = await readFile(new URL('../scripts/build.mjs', import.meta.url), 'utf8');
 
 assert.match(build, /ONE distributable JS extension file/);
-assert.match(build, /SuperGUI v6\.1\.3/);
-assert.ok(!build.includes("'src/grouped-categories.js'"), 'five-category grouping layer must not be bundled');
+assert.match(build, /SuperGUI v6\.1\.4/);
+assert.ok(!build.includes("'src/grouped-categories.js'"), 'grouped proxy layer must not be bundled');
+assert.ok(!build.includes("'src/real-categories.js'"), 'multi-registration category proxies must not be bundled');
+assert.match(build, /src\/palette-router\.js/);
 assert.match(build, /src\/markdown-support\.js/);
-assert.match(real, /for \(const category of categories\)/);
-assert.ok(!real.includes('for (const group of groups)'), 'grouped five-category registration must be gone');
 
 const categoriesMatch = palette.match(/const SG607_CATEGORIES = \[([\s\S]*?)\];/);
-assert.ok(categoriesMatch, 'object category list missing');
+assert.ok(categoriesMatch, 'palette category list missing');
 const categories = [...categoriesMatch[1].matchAll(/'([^']+)'/g)].map(m => m[1]).filter(x => !['basic','all'].includes(x));
-assert.ok(categories.length >= 30, `expected many object-specific categories, got ${categories.length}`);
+assert.ok(categories.length >= 30, `expected many navigable object categories, got ${categories.length}`);
 for (const name of ['terminal','chat','icon','leaderboard','markdown / rich text','web embed','table / data grid']) {
-  assert.ok(categories.includes(name), `missing object-specific category: ${name}`);
+  assert.ok(categories.includes(name), `missing palette category: ${name}`);
 }
 
 for (const opcode of ['setContentModeV612','getContentModeV612','setCodeLanguageV612','setMarkdownSourceV612','setCodeSourceV612']) {
@@ -31,4 +30,4 @@ assert.match(markdown, /```/);
 assert.match(markdown, /supergui-code-display/);
 assert.match(markdown, /supergui-markdown-display/);
 
-console.log(`OK: one JS extension file, ${categories.length} object-specific toolbox categories, safe Markdown/code display`);
+console.log(`OK: one JS extension file, ${categories.length} navigable palette categories, safe Markdown/code display`);
