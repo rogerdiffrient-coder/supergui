@@ -24,7 +24,10 @@ const SOURCE_FILES = [
   'src/chat-system.js',
   'src/compatibility.js',
   'src/v611-templates.js',
+  'src/markdown-support.js',
   'src/palette-router.js',
+  'src/markdown-routing.js',
+  'src/grouped-categories.js',
   'src/real-categories.js'
 ];
 export const OUTPUT = path.join(ROOT, 'dist/supergui.js');
@@ -38,8 +41,8 @@ export async function buildBundle() {
     SOURCE_FILES.map(async file => removeModuleSyntax(await readFile(path.join(ROOT, file), 'utf8')))
   );
   const body = modules.join('\n\n');
-  return `// SuperGUI v6.1.1 - generated file; edit src/ and run \`npm run build\`.
-// Load this file as an unsandboxed custom extension in PenguinMod, TurboWarp, or Cocrea / Gandi IDE.
+  return `// SuperGUI v6.1.2 - generated file; edit src/ and run \`npm run build\`.
+// ONE distributable JS file. Registers at most five toolbox categories in PenguinMod, TurboWarp, or Cocrea / Gandi IDE.
 (function (Scratch) {
   'use strict';
   if (!Scratch || !Scratch.extensions || !Scratch.extensions.unsandboxed) {
