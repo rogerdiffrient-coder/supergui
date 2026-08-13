@@ -20,7 +20,8 @@ const SOURCE_FILES = [
   'src/v6-interactive.js',
   'src/fullscreen-scaling.js',
   'src/v6-block-coverage.js',
-  'src/v6-item-blocks.js'
+  'src/v6-item-blocks.js',
+  'src/palette-router.js'
 ];
 export const OUTPUT = path.join(ROOT, 'dist/supergui.js');
 
@@ -33,7 +34,7 @@ export async function buildBundle() {
     SOURCE_FILES.map(async file => removeModuleSyntax(await readFile(path.join(ROOT, file), 'utf8')))
   );
   const body = modules.join('\n\n');
-  return `// SuperGUI v6.0.6 - generated file; edit src/ and run \`npm run build\`.
+  return `// SuperGUI v6.0.7 - generated file; edit src/ and run \`npm run build\`.
 // Load this file as an unsandboxed custom extension in PenguinMod, TurboWarp, or Gandi IDE.
 (function (Scratch) {
   'use strict';
