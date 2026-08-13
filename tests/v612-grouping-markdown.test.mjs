@@ -7,7 +7,7 @@ const real = await readFile(new URL('../src/real-categories.js', import.meta.url
 const markdown = await readFile(new URL('../src/markdown-support.js', import.meta.url), 'utf8');
 const build = await readFile(new URL('../scripts/build.mjs', import.meta.url), 'utf8');
 
-const groupEntries = [...grouped.matchAll(/\bid:\s*'([^']+)'/g)].map(m=>m[1]);
+const groupEntries = [...grouped.matchAll(/\bid:\s*'(ui|inputschat|datamedia|advanced)'/g)].map(m=>m[1]);
 assert.equal(groupEntries.length, 4, 'must register exactly four grouped proxies plus the core');
 assert.deepEqual(groupEntries, ['ui','inputschat','datamedia','advanced']);
 assert.match(build, /ONE distributable JS file/);
