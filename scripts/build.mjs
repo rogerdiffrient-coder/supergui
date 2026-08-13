@@ -23,6 +23,7 @@ const SOURCE_FILES = [
   'src/v6-item-blocks.js',
   'src/chat-system.js',
   'src/compatibility.js',
+  'src/v611-templates.js',
   'src/palette-router.js',
   'src/real-categories.js'
 ];
@@ -37,7 +38,7 @@ export async function buildBundle() {
     SOURCE_FILES.map(async file => removeModuleSyntax(await readFile(path.join(ROOT, file), 'utf8')))
   );
   const body = modules.join('\n\n');
-  return `// SuperGUI v6.1.0 - generated file; edit src/ and run \`npm run build\`.
+  return `// SuperGUI v6.1.1 - generated file; edit src/ and run \`npm run build\`.
 // Load this file as an unsandboxed custom extension in PenguinMod, TurboWarp, or Cocrea / Gandi IDE.
 (function (Scratch) {
   'use strict';
@@ -52,8 +53,6 @@ ${body}
   if (!runtime) throw new Error('SuperGUI could not find the Scratch runtime.');
 
   const core = new SuperGUI(runtime);
-  // Try real object categories first. If a Scratch mod rejects proxy categories,
-  // the core falls back to one complete category so no features disappear.
   const categoryResult = registerSuperGUICategories(core);
   core._realCategoryMode = !!categoryResult.complete;
   core._paletteCategory = categoryResult.complete ? 'basic' : 'all';
