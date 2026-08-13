@@ -1,5 +1,5 @@
-// SuperGUI v6.0.8 - generated file; edit src/ and run `npm run build`.
-// Load this file as an unsandboxed custom extension in PenguinMod, TurboWarp, or Gandi IDE.
+// SuperGUI v6.1.0 - generated file; edit src/ and run `npm run build`.
+// Load this file as an unsandboxed custom extension in PenguinMod, TurboWarp, or Cocrea / Gandi IDE.
 (function (Scratch) {
   'use strict';
   if (!Scratch || !Scratch.extensions || !Scratch.extensions.unsandboxed) {
@@ -4586,7 +4586,151 @@ SuperGUI.prototype.sg606TerminalError=function(a){sg606m(this,a,'terminal',e=>{e
 SuperGUI.prototype.sg606ChatBubble=function(a){sg606m(this,a,'chatbubble',e=>{e.text=String(a.TEXT||'');e.side=String(a.SIDE||'left');});};
 
 
-// SuperGUI 6.0.7: final block-palette router.
+// SuperGUI 6.1.0: built-in chat message bus with costume-aware PFPs.
+// Designed to use native COSTUME fields when available and a dynamic menu fallback otherwise.
+
+const _sg610ChatGetInfo = SuperGUI.prototype.getInfo;
+SuperGUI.prototype.getInfo = function () {
+  const info = _sg610ChatGetInfo.call(this);
+  const B = Scratch.BlockType;
+  const S = Scratch.ArgumentType;
+  info.menus = info.menus || {};
+  info.menus.sgChatSide = {acceptReporters:false,items:['left','right']};
+  info.menus.sgChatCostumes = {acceptReporters:true,items:'getChatCostumeMenu'};
+
+  const costumeType = S && S.COSTUME;
+  const pfpArg = costumeType
+    ? {type:costumeType}
+    : {type:S.STRING,menu:'sgChatCostumes',defaultValue:''};
+
+  const blocks = [
+    {blockType:B.LABEL,text:'─── Chat ───'},
+    {opcode:'whenChatMessageReceived',blockType:B.HAT,text:'when chat message received'},
+    {opcode:'chatMessage',blockType:B.REPORTER,text:'chat message'},
+    {opcode:'sendChatMessage',blockType:B.COMMAND,text:'send chat message [MESSAGE] name [NAME] PFP [PFP] side [SIDE]',arguments:{
+      MESSAGE:{type:S.STRING,defaultValue:'Hello!'},
+      NAME:{type:S.STRING,defaultValue:'Happity'},
+      PFP:pfpArg,
+      SIDE:{type:S.STRING,menu:'sgChatSide',defaultValue:'left'}
+    }},
+    {opcode:'chatSenderName',blockType:B.REPORTER,text:'chat sender name'},
+    {opcode:'chatSenderPFP',blockType:B.REPORTER,text:'chat sender PFP'},
+    {opcode:'chatMessageSide',blockType:B.REPORTER,text:'chat message side'},
+    {opcode:'chatHistoryJSON',blockType:B.REPORTER,text:'chat history JSON'},
+    {opcode:'clearChatHistory',blockType:B.COMMAND,text:'clear chat history'}
+  ];
+  info.blocks = blocks.concat(info.blocks || []);
+  return info;
+};
+
+function sg610ChatTarget(ext, util) {
+  if (util && util.target) return util.target;
+  const vm = Scratch.vm || globalThis.vm;
+  if (vm && vm.editingTarget) return vm.editingTarget;
+  const runtime = ext && ext.runtime;
+  return runtime && typeof runtime.getEditingTarget === 'function' ? runtime.getEditingTarget() : null;
+}
+
+function sg610ChatCostumes(target) {
+  if (!target) return [];
+  if (typeof target.getCostumes === 'function') {
+    try { const c = target.getCostumes(); if (Array.isArray(c)) return c; } catch (e) {}
+  }
+  if (target.sprite && Array.isArray(target.sprite.costumes)) return target.sprite.costumes;
+  return [];
+}
+
+function sg610CostumeDataURI(costume) {
+  if (!costume) return '';
+  try {
+    if (costume.asset && typeof costume.asset.encodeDataURI === 'function') return costume.asset.encodeDataURI();
+    if (typeof costume.dataURI === 'string') return costume.dataURI;
+    if (typeof costume.url === 'string') return costume.url;
+  } catch (e) {}
+  return '';
+}
+
+SuperGUI.prototype.getChatCostumeMenu = function () {
+  const target = sg610ChatTarget(this);
+  const names = sg610ChatCostumes(target).map(c => String(c && c.name || '')).filter(Boolean);
+  return names.length ? names : [''];
+};
+
+SuperGUI.prototype._resolveChatCostume = function (name, util) {
+  const target = sg610ChatTarget(this, util);
+  const costumeName = String(name || '');
+  const costumes = sg610ChatCostumes(target);
+  const costume = costumes.find(c => String(c && c.name || '') === costumeName) || null;
+  return {name:costumeName,src:sg610CostumeDataURI(costume)};
+};
+
+SuperGUI.prototype.whenChatMessageReceived = function () { return false; };
+
+SuperGUI.prototype.sendChatMessage = function (args, util) {
+  this._chatHistory = Array.isArray(this._chatHistory) ? this._chatHistory : [];
+  const pfp = this._resolveChatCostume(args.PFP, util);
+  const message = {
+    message:String(args.MESSAGE ?? ''),
+    name:String(args.NAME ?? ''),
+    pfp:pfp.name,
+    pfpSrc:pfp.src,
+    side:String(args.SIDE || 'left') === 'right' ? 'right' : 'left',
+    timestamp:Date.now()
+  };
+  this._lastChatMessage = message;
+  this._chatHistory.push(message);
+  if (this._chatHistory.length > 500) this._chatHistory.splice(0, this._chatHistory.length - 500);
+  try { this.runtime.startHats(EXT_ID + '_whenChatMessageReceived'); } catch (e) {}
+};
+
+SuperGUI.prototype.chatMessage = function () { return String(this._lastChatMessage && this._lastChatMessage.message || ''); };
+SuperGUI.prototype.chatSenderName = function () { return String(this._lastChatMessage && this._lastChatMessage.name || ''); };
+SuperGUI.prototype.chatSenderPFP = function () { return String(this._lastChatMessage && this._lastChatMessage.pfp || ''); };
+SuperGUI.prototype.chatMessageSide = function () { return String(this._lastChatMessage && this._lastChatMessage.side || 'left'); };
+SuperGUI.prototype.chatHistoryJSON = function () { return JSON.stringify(Array.isArray(this._chatHistory) ? this._chatHistory : []); };
+SuperGUI.prototype.clearChatHistory = function () { this._chatHistory = []; this._lastChatMessage = null; };
+
+
+// SuperGUI 6.1.0 cross-host compatibility helpers and safe dropdown upgrades.
+
+function sg610DetectHost() {
+  const host = String((globalThis.location && globalThis.location.hostname) || '').toLowerCase();
+  if (host.includes('penguinmod')) return 'PenguinMod';
+  if (host.includes('turbowarp')) return 'TurboWarp';
+  if (host.includes('cocrea') || host.includes('getgandi') || host.includes('gandi')) return 'Cocrea / Gandi IDE';
+  return 'Scratch-compatible host';
+}
+
+const _sg610CompatGetInfo = SuperGUI.prototype.getInfo;
+SuperGUI.prototype.getInfo = function () {
+  const info = _sg610CompatGetInfo.call(this);
+  const S = Scratch.ArgumentType;
+  const B = Scratch.BlockType;
+  info.menus = info.menus || {};
+  info.menus.sgAlertLevels = {acceptReporters:false,items:['info','success','warning','error']};
+
+  // Upgrade categorical text fields that were accidentally left as plain strings.
+  for (const block of info.blocks || []) {
+    if (!block || !block.arguments) continue;
+    if (block.opcode === 'sg606Alert' && block.arguments.LEVEL) {
+      block.arguments.LEVEL = {type:S.STRING,menu:'sgAlertLevels',defaultValue:'info'};
+    }
+  }
+
+  // Tiny diagnostics reporter: useful when a mod behaves differently.
+  if (!(info.blocks || []).some(block => block && block.opcode === 'getSuperGUIHost')) {
+    info.blocks = [
+      {blockType:B.LABEL,text:'─── Compatibility ───'},
+      {opcode:'getSuperGUIHost',blockType:B.REPORTER,text:'SuperGUI host'}
+    ].concat(info.blocks || []);
+  }
+  return info;
+};
+
+SuperGUI.prototype.getSuperGUIHost = function () { return sg610DetectHost(); };
+
+
+// SuperGUI 6.1.0: final block-palette router.
 // Rebuilds the palette from the complete block list so late-added blocks cannot bypass categories.
 
 const SG607_CATEGORIES = [
@@ -4595,7 +4739,7 @@ const SG607_CATEGORIES = [
   'notifications','badges','meter','gauge','thermometer','sparkline','bar chart','line chart','pie chart','mini map','map marker',
   'clock','timer','calendar','date picker','file picker','text area','password input','email input','url input','stepper',
   'segmented control','toolbar','menu bar','context menu','tree view','list','table / data grid','stat card','keys / hotkeys',
-  'scroll area','web embed','markdown / rich text','terminal','chat bubble','advanced v6','data / services','all'
+  'scroll area','web embed','markdown / rich text','terminal','chat','chat bubble','advanced v6','data / services','all'
 ];
 
 const SG607_CATEGORY_OPCODES = {
@@ -4644,6 +4788,9 @@ const SG607_CATEGORY_OPCODES = {
     'whenTerminalCommandV6','getLastTerminalCommandV6','setTerminalPromptV6','setTerminalInputEnabledV6','setTerminalEchoV6','focusTerminalV6','getTerminalHistoryV6',
     'clearTerminalHistoryV605','getTerminalPromptV605','terminalInputEnabledV605','terminalEchoEnabledV605'
   ]),
+  chat: new Set([
+    'whenChatMessageReceived','chatMessage','sendChatMessage','chatSenderName','chatSenderPFP','chatMessageSide','chatHistoryJSON','clearChatHistory'
+  ]),
   'chat bubble': new Set(['sg606ChatBubble','setChatBubbleSideV6']),
   'advanced v6': new Set([
     'setV6ItemData','getV6ItemData','setV6ItemText','setV6ItemIcon','setV6ItemItems','getV6ItemItems','addV6Item','removeV6ItemAt','clearV6Items','getV6ItemAt','getV6ItemCount',
@@ -4667,7 +4814,7 @@ function sg607SectionCategory(label) {
   if (/leaderboard/.test(s)) return 'leaderboard';
   if (/game services|storage|cloud|achievement|data/.test(s)) return 'data / services';
   if (/terminal/.test(s)) return 'terminal';
-  if (/chat/.test(s)) return 'chat bubble';
+  if (/chat/.test(s)) return 'chat';
   if (/v6/.test(s)) return 'advanced v6';
   return 'basic';
 }
@@ -4719,27 +4866,27 @@ SuperGUI.prototype.getInfo = function () {
 };
 
 
-// SuperGUI 6.0.8: real PenguinMod toolbox categories.
+// SuperGUI 6.1.0: real toolbox categories with host-safe fallback.
 // One SuperGUI engine owns all state/UI. Lightweight category proxies expose
-// object-specific palettes that delegate every opcode/menu call to that engine.
+// object-specific palettes and delegate every opcode/menu call to that engine.
 
-const _sg608CoreGetInfo = SuperGUI.prototype.getInfo;
+const _sg610CoreGetInfo = SuperGUI.prototype.getInfo;
 SuperGUI.prototype.getInfo = function () {
-  const info = _sg608CoreGetInfo.call(this);
+  const info = _sg610CoreGetInfo.call(this);
   if (this._realCategoryMode && info && Array.isArray(info.blocks)) {
     info.blocks = info.blocks.filter(block => !(block && block.opcode === 'setBlockPaletteMode'));
   }
   return info;
 };
 
-function sg608CategoryId(category) {
+function sg610CategoryId(category) {
   return 'supergui' + String(category || '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '')
     .slice(0, 42);
 }
 
-function sg608CategoryName(category) {
+function sg610CategoryName(category) {
   return 'SuperGUI • ' + String(category || '').replace(/\b\w/g, c => c.toUpperCase());
 }
 
@@ -4760,14 +4907,14 @@ class SuperGUICategoryProxy {
     }
 
     const clone = {...info};
-    clone.id = sg608CategoryId(this.category);
-    clone.name = sg608CategoryName(this.category);
+    clone.id = sg610CategoryId(this.category);
+    clone.name = sg610CategoryName(this.category);
     clone.blocks = (info.blocks || []).filter(block => !(block && block.opcode === 'setBlockPaletteMode'));
     return clone;
   }
 }
 
-function sg608ProxyFor(core, category) {
+function sg610ProxyFor(core, category) {
   const target = new SuperGUICategoryProxy(core, category);
   return new Proxy(target, {
     get(obj, prop, receiver) {
@@ -4781,30 +4928,85 @@ function sg608ProxyFor(core, category) {
   });
 }
 
-function registerSuperGUICategories(core) {
-  core._realCategoryMode = true;
-  core._paletteCategory = 'basic';
+function sg610InstallHatRouting(core) {
+  const runtime = core && core.runtime;
+  if (!runtime || typeof runtime.startHats !== 'function' || runtime.__superGUIHatRouter) return;
+  const original = runtime.startHats.bind(runtime);
+  runtime.__superGUIHatRouter = {original, core};
+  runtime.startHats = function (opcode, matchFields, target) {
+    let threads = original(opcode, matchFields, target) || [];
+    const prefix = EXT_ID + '_';
+    if (typeof opcode !== 'string' || !opcode.startsWith(prefix)) return threads;
+    const shortOpcode = opcode.slice(prefix.length);
+    const ids = core._superGUIProxyHatIds && core._superGUIProxyHatIds[shortOpcode];
+    if (!ids || !ids.size) return threads;
+    for (const id of ids) {
+      try {
+        const extra = original(id + '_' + shortOpcode, matchFields, target) || [];
+        if (Array.isArray(threads) && Array.isArray(extra)) threads.push(...extra);
+      } catch (e) {}
+    }
+    return threads;
+  };
+}
 
+function registerSuperGUICategories(core) {
+  core._superGUIProxyHatIds = Object.create(null);
   const categories = (typeof SG607_CATEGORIES !== 'undefined' ? SG607_CATEGORIES : [])
     .filter(category => category !== 'basic' && category !== 'all');
 
+  let attempted = 0;
+  let registered = 0;
+  const failures = [];
+
   for (const category of categories) {
-    const proxy = sg608ProxyFor(core, category);
+    const proxy = sg610ProxyFor(core, category);
     let info;
-    try { info = proxy.getInfo(); } catch (e) { console.warn('[SuperGUI] category failed:', category, e); continue; }
+    try { info = proxy.getInfo(); }
+    catch (e) { failures.push({category,error:e}); continue; }
+
     const usefulBlocks = (info.blocks || []).filter(block => block && block.opcode);
     if (!usefulBlocks.length) continue;
-    Scratch.extensions.register(proxy);
+    attempted++;
+    try {
+      Scratch.extensions.register(proxy);
+      registered++;
+      const proxyId = info.id;
+      for (const block of usefulBlocks) {
+        if (block.blockType !== Scratch.BlockType.HAT) continue;
+        const opcode = String(block.opcode || '');
+        if (!opcode) continue;
+        if (!core._superGUIProxyHatIds[opcode]) core._superGUIProxyHatIds[opcode] = new Set();
+        core._superGUIProxyHatIds[opcode].add(proxyId);
+      }
+    } catch (e) {
+      failures.push({category,error:e});
+      console.warn('[SuperGUI] toolbox category registration failed:', category, e);
+    }
   }
+
+  sg610InstallHatRouting(core);
+  return {
+    attempted,
+    registered,
+    failures,
+    complete: attempted > 0 && registered === attempted
+  };
 }
 
 
   const runtime = (Scratch.vm && Scratch.vm.runtime) || Scratch.runtime ||
     (globalThis.vm && globalThis.vm.runtime);
   if (!runtime) throw new Error('SuperGUI could not find the Scratch runtime.');
+
   const core = new SuperGUI(runtime);
-  core._realCategoryMode = true;
-  core._paletteCategory = 'basic';
+  // Try real object categories first. If a Scratch mod rejects proxy categories,
+  // the core falls back to one complete category so no features disappear.
+  const categoryResult = registerSuperGUICategories(core);
+  core._realCategoryMode = !!categoryResult.complete;
+  core._paletteCategory = categoryResult.complete ? 'basic' : 'all';
+  if (!categoryResult.complete) {
+    console.warn('[SuperGUI] Falling back to the complete single-category palette on this host.', categoryResult.failures || []);
+  }
   Scratch.extensions.register(core);
-  registerSuperGUICategories(core);
 })(globalThis.Scratch);
