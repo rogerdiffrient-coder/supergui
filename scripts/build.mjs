@@ -27,7 +27,6 @@ const SOURCE_FILES = [
   'src/markdown-support.js',
   'src/palette-router.js',
   'src/markdown-routing.js',
-  'src/grouped-categories.js',
   'src/real-categories.js'
 ];
 export const OUTPUT = path.join(ROOT, 'dist/supergui.js');
@@ -41,8 +40,8 @@ export async function buildBundle() {
     SOURCE_FILES.map(async file => removeModuleSyntax(await readFile(path.join(ROOT, file), 'utf8')))
   );
   const body = modules.join('\n\n');
-  return `// SuperGUI v6.1.2 - generated file; edit src/ and run \`npm run build\`.
-// ONE distributable JS file. Registers at most five toolbox categories in PenguinMod, TurboWarp, or Cocrea / Gandi IDE.
+  return `// SuperGUI v6.1.3 - generated file; edit src/ and run \`npm run build\`.
+// ONE distributable JS extension file with object-specific toolbox categories in PenguinMod, TurboWarp, or Cocrea / Gandi IDE.
 (function (Scratch) {
   'use strict';
   if (!Scratch || !Scratch.extensions || !Scratch.extensions.unsandboxed) {
@@ -69,6 +68,10 @@ ${body}
 
 export async function writeBundle() {
   await mkdir(path.dirname(OUTPUT), { recursive: true });
+  await writeBundleToFile();
+}
+
+async function writeBundleToFile() {
   await writeFile(OUTPUT, await buildBundle());
   const info = await stat(OUTPUT);
   console.log(`Built ${path.relative(ROOT, OUTPUT)} (${info.size.toLocaleString('en-US')} bytes)`);
