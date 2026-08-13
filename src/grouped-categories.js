@@ -15,7 +15,7 @@ const SG612_GROUPS = [
     id: 'inputschat',
     name: 'Inputs & Chat',
     categories: [
-      'file picker','text area','password input','email input','url input','chat bubble','terminal'
+      'file picker','text area','password input','email input','url input','chat','chat bubble','terminal'
     ]
   },
   {
