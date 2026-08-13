@@ -19,6 +19,9 @@ for (const id of ['Messages','BotMessage','UserMessage','Typing','MessageInput',
 }
 assert.ok(!/fetch\s*\(|ollama|openai|anthropic|gemini|\/api\/chat/i.test(templates), 'templates must not contain built-in AI/network logic');
 assert.ok(build.includes("'src/v611-templates.js'"), 'template pack is not included in generated bundle');
-assert.ok(build.includes('SuperGUI v6.1.1'), 'bundle version was not bumped');
+const versionMatch = build.match(/SuperGUI v(\d+)\.(\d+)\.(\d+)/);
+assert.ok(versionMatch, 'bundle version missing');
+const version = versionMatch.slice(1).map(Number);
+assert.ok(version[0] > 6 || (version[0] === 6 && (version[1] > 1 || (version[1] === 1 && version[2] >= 1))), 'template pack requires SuperGUI 6.1.1 or newer');
 
 console.log(`OK: ${expected.length} additional UI-only templates, including generic Chatbot`);
