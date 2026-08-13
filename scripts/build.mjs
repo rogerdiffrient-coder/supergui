@@ -26,8 +26,7 @@ const SOURCE_FILES = [
   'src/v611-templates.js',
   'src/markdown-support.js',
   'src/palette-router.js',
-  'src/markdown-routing.js',
-  'src/real-categories.js'
+  'src/markdown-routing.js'
 ];
 export const OUTPUT = path.join(ROOT, 'dist/supergui.js');
 
@@ -40,8 +39,9 @@ export async function buildBundle() {
     SOURCE_FILES.map(async file => removeModuleSyntax(await readFile(path.join(ROOT, file), 'utf8')))
   );
   const body = modules.join('\n\n');
-  return `// SuperGUI v6.1.3 - generated file; edit src/ and run \`npm run build\`.
-// ONE distributable JS extension file with object-specific toolbox categories in PenguinMod, TurboWarp, or Cocrea / Gandi IDE.
+  return `// SuperGUI v6.1.4 - generated file; edit src/ and run \`npm run build\`.
+// ONE distributable JS extension file and exactly one Scratch.extensions.register() call.
+// Object organization is handled by SuperGUI's built-in palette navigator so hosts see one installed extension.
 (function (Scratch) {
   'use strict';
   if (!Scratch || !Scratch.extensions || !Scratch.extensions.unsandboxed) {
@@ -55,12 +55,8 @@ ${body}
   if (!runtime) throw new Error('SuperGUI could not find the Scratch runtime.');
 
   const core = new SuperGUI(runtime);
-  const categoryResult = registerSuperGUICategories(core);
-  core._realCategoryMode = !!categoryResult.complete;
-  core._paletteCategory = categoryResult.complete ? 'basic' : 'all';
-  if (!categoryResult.complete) {
-    console.warn('[SuperGUI] Falling back to the complete single-category palette on this host.', categoryResult.failures || []);
-  }
+  core._realCategoryMode = false;
+  core._paletteCategory = 'basic';
   Scratch.extensions.register(core);
 })(globalThis.Scratch);
 `;

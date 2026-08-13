@@ -1,14 +1,14 @@
 {
   "name": "supergui-scratch-extension",
-  "version": "6.1.3",
+  "version": "6.1.4",
   "description": "A visual GUI builder extension for PenguinMod, TurboWarp, and Cocrea / Gandi IDE.",
   "license": "MIT",
   "type": "module",
   "private": true,
   "scripts": {
     "build": "node scripts/build.mjs",
-    "check": "node scripts/build.mjs && node tests/project.test.mjs && node tests/game-services.test.mjs && node tests/v6-functionality.test.mjs && node tests/chat-compatibility.test.mjs && node tests/template-pack.test.mjs && node tests/v612-grouping-markdown.test.mjs",
-    "test": "node tests/project.test.mjs && node tests/game-services.test.mjs && node tests/v6-functionality.test.mjs && node tests/chat-compatibility.test.mjs && node tests/template-pack.test.mjs && node tests/v612-grouping-markdown.test.mjs",
+    "check": "node scripts/build.mjs && node tests/project.test.mjs && node tests/game-services.test.mjs && node tests/v6-functionality.test.mjs && node tests/chat-compatibility.test.mjs && node tests/template-pack.test.mjs && node tests/v612-grouping-markdown.test.mjs && node tests/v614-single-registration.test.mjs",
+    "test": "node tests/project.test.mjs && node tests/game-services.test.mjs && node tests/v6-functionality.test.mjs && node tests/chat-compatibility.test.mjs && node tests/template-pack.test.mjs && node tests/v612-grouping-markdown.test.mjs && node tests/v614-single-registration.test.mjs",
     "test:services": "node tests/game-services.test.mjs"
   },
   "files": [
