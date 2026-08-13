@@ -44,8 +44,8 @@ assert.deepEqual(elementTypes, editorTypes, 'editor does not cover every element
 assert.deepEqual(elementTypes, renderedTypes, 'renderer does not cover every element type');
 assert.ok(!renderer.slice(renderer.indexOf("case 'joystick'"), renderer.indexOf("case 'carousel'")).includes("document.addEventListener('mousemove', onMove);"), 'interactive controls leaked global listeners');
 assert.ok(bundle.includes('const core = new SuperGUI(runtime)'), 'bundle does not create one shared SuperGUI core');
-assert.equal((bundle.match(/Scratch\.extensions\.register\(/g) || []).length, 1, 'SuperGUI must register exactly once');
-assert.ok(bundle.includes('Scratch.extensions.register(core)'), 'bundle does not register the core extension');
+assert.equal((bundle.match(/Scratch\.extensions\.register\(core\)/g) || []).length, 1, 'SuperGUI core must register exactly once');
+assert.ok(!/Scratch\.extensions\.register\((?:proxy|new\s+SuperGUI|new\s+\w+Category)/.test(bundle), 'extra extension registration leaked into bundle');
 assert.ok(!bundle.includes('registerSuperGUICategories(core)'), 'multi-registration category proxies must not be bundled');
 assert.ok(palette.includes('setBlockPaletteMode') && palette.includes('SG607_CATEGORIES'), 'single-extension palette navigator is missing');
 assert.ok(bundle.includes('Scratch.runtime') && bundle.includes('globalThis.vm'), 'bundle must support host runtime locations');
